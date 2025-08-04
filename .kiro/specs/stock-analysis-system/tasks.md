@@ -109,21 +109,21 @@ This implementation plan converts the comprehensive Stock Analysis System design
 
 ### 5. Enhanced Risk Management Engine
 
-- [ ] 5.1 Implement comprehensive VaR calculations
+- [x] 5.1 Implement comprehensive VaR calculations
   - Create EnhancedRiskManagementEngine with multiple VaR methods
   - Implement historical, parametric, and Monte Carlo VaR calculations
   - Add Conditional VaR (CVaR) for tail risk assessment
   - Create dynamic volatility measures (historical and realized)
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 5.2 Build advanced risk metrics calculation
+- [x] 5.2 Build advanced risk metrics calculation
   - Implement Sharpe, Sortino, and Calmar ratio calculations
   - Add beta calculation and market risk assessment
   - Create liquidity risk scoring based on volume patterns
   - Implement seasonal risk scoring integration with Spring Festival analysis
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 5.3 Create dynamic position sizing system
+- [x] 5.3 Create dynamic position sizing system
   - Implement Kelly Criterion-based position sizing
   - Add risk-adjusted position sizing with multiple factor adjustments
   - Create portfolio concentration risk monitoring
@@ -132,21 +132,21 @@ This implementation plan converts the comprehensive Stock Analysis System design
 
 ### 6. Institutional Behavior Analysis Engine
 
-- [ ] 6.1 Implement institutional data collection
+- [x] 6.1 Implement institutional data collection
   - Create data collectors for dragon-tiger list, shareholder data, and block trades
   - Add data parsing and standardization for multiple institutional data sources
   - Implement institutional classification (mutual funds, social security, QFII, hot money)
   - Create institutional activity timeline tracking
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 6.2 Build graph analytics for institutional relationships
+- [x] 6.2 Build graph analytics for institutional relationships
   - Integrate NetworkX for institutional relationship analysis
   - Implement coordinated activity detection algorithms
   - Create institutional network visualization
   - Add relationship strength scoring and pattern detection
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 6.3 Create institutional attention scoring system
+- [x] 6.3 Create institutional attention scoring system
   - Implement comprehensive institutional attention scoring (0-100 scale)
   - Add time-weighted scoring for recent vs. historical activity
   - Create institutional behavior pattern classification

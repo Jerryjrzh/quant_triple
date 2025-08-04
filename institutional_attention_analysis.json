@@ -1,0 +1,481 @@
+{
+  "analysis_summary": {
+    "analysis_date": "2025-08-04",
+    "stock_codes": [
+      "000001",
+      "000002",
+      "600000",
+      "600036",
+      "000858"
+    ],
+    "date_range": {
+      "start": "2024-01-01",
+      "end": "2024-03-31"
+    },
+    "total_institutions": 214,
+    "total_activities": 363,
+    "average_attention_score": 65.81566140864967
+  },
+  "stock_profiles": {
+    "000001": {
+      "total_attention_score": 61.883481013045234,
+      "institutional_count": 38,
+      "active_institutional_count": 24,
+      "total_activities": 59,
+      "recent_activities": 30,
+      "activity_trend": 0.0,
+      "coordination_score": 57.89473684210526,
+      "dominant_patterns": [
+        [
+          "opportunistic",
+          37
+        ],
+        [
+          "contrarian",
+          1
+        ]
+      ],
+      "attention_distribution": {
+        "moderate": 13,
+        "high": 25
+      },
+      "top_institutions": [
+        {
+          "name": "华泰证券股份有限公司上海营业部",
+          "type": "securities_firm",
+          "attention_score": 78.65775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "东方财富证券股份有限公司成都营业部",
+          "type": "securities_firm",
+          "attention_score": 77.40775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "建信基金管理有限责任公司",
+          "type": "mutual_fund",
+          "attention_score": 74.4910906353667,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 1
+        },
+        {
+          "name": "东方财富证券股份有限公司广州营业部",
+          "type": "securities_firm",
+          "attention_score": 73.40775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "广发证券股份有限公司北京营业部",
+          "type": "securities_firm",
+          "attention_score": 73.40775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        }
+      ]
+    },
+    "000002": {
+      "total_attention_score": 65.29702803474528,
+      "institutional_count": 44,
+      "active_institutional_count": 17,
+      "total_activities": 79,
+      "recent_activities": 19,
+      "activity_trend": -0.3666666666666667,
+      "coordination_score": 79.54545454545455,
+      "dominant_patterns": [
+        [
+          "opportunistic",
+          40
+        ],
+        [
+          "momentum_following",
+          2
+        ],
+        [
+          "distributing",
+          1
+        ],
+        [
+          "accumulating",
+          1
+        ]
+      ],
+      "attention_distribution": {
+        "high": 32,
+        "moderate": 12
+      },
+      "top_institutions": [
+        {
+          "name": "华泰证券股份有限公司成都营业部",
+          "type": "securities_firm",
+          "attention_score": 74.25775730203337,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "dormant",
+          "total_activities": 2,
+          "recent_activities": 0
+        },
+        {
+          "name": "招商证券股份有限公司南京营业部",
+          "type": "securities_firm",
+          "attention_score": 74.25775730203337,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 1
+        },
+        {
+          "name": "建信基金管理有限责任公司",
+          "type": "mutual_fund",
+          "attention_score": 73.96244565974072,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "dormant",
+          "total_activities": 3,
+          "recent_activities": 0
+        },
+        {
+          "name": "博时基金管理有限公司",
+          "type": "mutual_fund",
+          "attention_score": 73.96244565974072,
+          "behavior_pattern": "distributing",
+          "activity_intensity": "dormant",
+          "total_activities": 3,
+          "recent_activities": 0
+        },
+        {
+          "name": "东方财富证券股份有限公司杭州营业部",
+          "type": "securities_firm",
+          "attention_score": 73.90775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "dormant",
+          "total_activities": 2,
+          "recent_activities": 0
+        }
+      ]
+    },
+    "600000": {
+      "total_attention_score": 66.95836389618007,
+      "institutional_count": 35,
+      "active_institutional_count": 22,
+      "total_activities": 65,
+      "recent_activities": 27,
+      "activity_trend": -0.09999999999999998,
+      "coordination_score": 88.57142857142857,
+      "dominant_patterns": [
+        [
+          "opportunistic",
+          35
+        ]
+      ],
+      "attention_distribution": {
+        "high": 30,
+        "moderate": 5
+      },
+      "top_institutions": [
+        {
+          "name": "广发基金管理有限公司",
+          "type": "mutual_fund",
+          "attention_score": 78.65775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "中信证券股份有限公司北京营业部",
+          "type": "securities_firm",
+          "attention_score": 76.86244565974073,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 3,
+          "recent_activities": 1
+        },
+        {
+          "name": "易方达基金管理有限公司",
+          "type": "mutual_fund",
+          "attention_score": 76.63659606599444,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "moderate",
+          "total_activities": 7,
+          "recent_activities": 4
+        },
+        {
+          "name": "申万宏源证券有限公司北京营业部",
+          "type": "securities_firm",
+          "attention_score": 76.27553693671175,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 5,
+          "recent_activities": 1
+        },
+        {
+          "name": "东方财富证券股份有限公司上海营业部",
+          "type": "securities_firm",
+          "attention_score": 76.13552258281764,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "dormant",
+          "total_activities": 3,
+          "recent_activities": 0
+        }
+      ]
+    },
+    "600036": {
+      "total_attention_score": 65.78054554641041,
+      "institutional_count": 56,
+      "active_institutional_count": 25,
+      "total_activities": 83,
+      "recent_activities": 29,
+      "activity_trend": -0.033333333333333326,
+      "coordination_score": 96.42857142857143,
+      "dominant_patterns": [
+        [
+          "opportunistic",
+          54
+        ],
+        [
+          "distributing",
+          1
+        ],
+        [
+          "contrarian",
+          1
+        ]
+      ],
+      "attention_distribution": {
+        "high": 42,
+        "moderate": 13,
+        "very_high": 1
+      },
+      "top_institutions": [
+        {
+          "name": "华泰证券股份有限公司上海营业部",
+          "type": "securities_firm",
+          "attention_score": 82.65775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "中信证券股份有限公司北京营业部",
+          "type": "securities_firm",
+          "attention_score": 76.13552258281764,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 3,
+          "recent_activities": 1
+        },
+        {
+          "name": "海通证券股份有限公司上海营业部",
+          "type": "securities_firm",
+          "attention_score": 75.65775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 1
+        },
+        {
+          "name": "海通证券股份有限公司北京营业部",
+          "type": "securities_firm",
+          "attention_score": 75.21244565974072,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 3,
+          "recent_activities": 2
+        },
+        {
+          "name": "申万宏源证券有限公司南京营业部",
+          "type": "securities_firm",
+          "attention_score": 75.15775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 1
+        }
+      ]
+    },
+    "000858": {
+      "total_attention_score": 69.15888855286745,
+      "institutional_count": 41,
+      "active_institutional_count": 23,
+      "total_activities": 77,
+      "recent_activities": 26,
+      "activity_trend": -0.1333333333333333,
+      "coordination_score": 100.0,
+      "dominant_patterns": [
+        [
+          "opportunistic",
+          38
+        ],
+        [
+          "momentum_following",
+          1
+        ],
+        [
+          "contrarian",
+          1
+        ],
+        [
+          "distributing",
+          1
+        ]
+      ],
+      "attention_distribution": {
+        "high": 36,
+        "moderate": 3,
+        "very_high": 2
+      },
+      "top_institutions": [
+        {
+          "name": "国泰君安证券股份有限公司南京营业部",
+          "type": "securities_firm",
+          "attention_score": 82.65775730203336,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 2,
+          "recent_activities": 2
+        },
+        {
+          "name": "工银瑞信基金管理有限公司",
+          "type": "mutual_fund",
+          "attention_score": 80.06551460406673,
+          "behavior_pattern": "contrarian",
+          "activity_intensity": "light",
+          "total_activities": 4,
+          "recent_activities": 1
+        },
+        {
+          "name": "南方基金管理股份有限公司",
+          "type": "mutual_fund",
+          "attention_score": 78.31227562217133,
+          "behavior_pattern": "opportunistic",
+          "activity_intensity": "light",
+          "total_activities": 5,
+          "recent_activities": 1
+        },
+        {
+          "name": "易方达基金管理有限公司",
+          "type": "mutual_fund",
+          "attention_score": 78.04628383483596,
+          "behavior_pattern": "momentum_following",
+          "activity_intensity": "light",
+          "total_activities": 4,
+          "recent_activities": 1
+        },
+        {
+          "name": "招商证券股份有限公司上海营业部",
+          "type": "securities_firm",
+          "attention_score": 77.64994565974072,
+          "behavior_pattern": "distributing",
+          "activity_intensity": "light",
+          "total_activities": 3,
+          "recent_activities": 1
+        }
+      ]
+    }
+  },
+  "screening_results": [],
+  "alerts": [
+    {
+      "stock_code": "000858",
+      "alert_type": "coordinated_activity",
+      "priority": "medium",
+      "attention_score": 66.71909387990945,
+      "institutional_count": 36,
+      "active_institutions": 5,
+      "coordination_score": 100.0,
+      "activity_trend": -0.8333333333333334,
+      "dominant_pattern": "opportunistic",
+      "message": "Stock 000858 has high institutional attention (score: 66.7). 36 institutions tracked, 5 recently active. Dominant behavior: Opportunistic. Coordinated activity detected (strength: 100.00). Activity trend is decreasing.",
+      "timestamp": "2025-08-04 11:10:31.810196",
+      "data_quality": 0.8194444444444445
+    },
+    {
+      "stock_code": "600036",
+      "alert_type": "coordinated_activity",
+      "priority": "medium",
+      "attention_score": 66.60985021447668,
+      "institutional_count": 45,
+      "active_institutions": 19,
+      "coordination_score": 100.0,
+      "activity_trend": -0.19999999999999996,
+      "dominant_pattern": "opportunistic",
+      "message": "Stock 600036 has high institutional attention (score: 66.6). 45 institutions tracked, 19 recently active. Dominant behavior: Opportunistic. Coordinated activity detected (strength: 100.00).",
+      "timestamp": "2025-08-04 11:10:31.810194",
+      "data_quality": 0.8177777777777776
+    },
+    {
+      "stock_code": "000002",
+      "alert_type": "coordinated_activity",
+      "priority": "medium",
+      "attention_score": 66.24059172642866,
+      "institutional_count": 39,
+      "active_institutions": 15,
+      "coordination_score": 100.0,
+      "activity_trend": -0.33333333333333337,
+      "dominant_pattern": "opportunistic",
+      "message": "Stock 000002 has high institutional attention (score: 66.2). 39 institutions tracked, 15 recently active. Dominant behavior: Opportunistic. Coordinated activity detected (strength: 100.00). Activity trend is decreasing.",
+      "timestamp": "2025-08-04 11:10:31.810187",
+      "data_quality": 0.7974358974358976
+    },
+    {
+      "stock_code": "600000",
+      "alert_type": "coordinated_activity",
+      "priority": "medium",
+      "attention_score": 65.51278634276784,
+      "institutional_count": 34,
+      "active_institutions": 14,
+      "coordination_score": 100.0,
+      "activity_trend": -0.5,
+      "dominant_pattern": "opportunistic",
+      "message": "Stock 600000 has high institutional attention (score: 65.5). 34 institutions tracked, 14 recently active. Dominant behavior: Opportunistic. Coordinated activity detected (strength: 100.00). Activity trend is decreasing.",
+      "timestamp": "2025-08-04 11:10:31.810191",
+      "data_quality": 0.7941176470588235
+    },
+    {
+      "stock_code": "000001",
+      "alert_type": "coordinated_activity",
+      "priority": "medium",
+      "attention_score": 64.85926891600292,
+      "institutional_count": 39,
+      "active_institutions": 15,
+      "coordination_score": 100.0,
+      "activity_trend": -0.33333333333333337,
+      "dominant_pattern": "opportunistic",
+      "message": "Stock 000001 has high institutional attention (score: 64.9). 39 institutions tracked, 15 recently active. Dominant behavior: Opportunistic. Coordinated activity detected (strength: 100.00). Activity trend is decreasing.",
+      "timestamp": "2025-08-04 11:10:31.810180",
+      "data_quality": 0.8153846153846155
+    }
+  ],
+  "distributions": {
+    "attention_levels": {
+      "moderate": 46,
+      "high": 165,
+      "very_high": 3
+    },
+    "behavior_patterns": {
+      "opportunistic": 204,
+      "contrarian": 3,
+      "distributing": 3,
+      "momentum_following": 3,
+      "accumulating": 1
+    },
+    "activity_intensity": {
+      "dormant": 103,
+      "light": 108,
+      "moderate": 3
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "network_metrics": {
+    "total_institutions": 78,
+    "total_relationships": 1857,
+    "network_density": 0.6183816183816184,
+    "avg_clustering": 0.7517107433878062,
+    "avg_path_length": 1.3816183816183816,
+    "modularity": 0.11083398617606552,
+    "num_communities": 2
+  },
+  "top_institutions": {
+    "by_degree_centrality": [
+      {
+        "institution_id": "mutual_fund_741508",
+        "name": "嘉实基金管理有限公司",
+        "centrality": 0.8701298701298702
+      },
+      {
+        "institution_id": "mutual_fund_660067",
+        "name": "华夏基金管理有限公司",
+        "centrality": 0.8441558441558442
+      },
+      {
+        "institution_id": "mutual_fund_062887",
+        "name": "南方基金管理股份有限公司",
+        "centrality": 0.8441558441558442
+      },
+      {
+        "institution_id": "mutual_fund_740931",
+        "name": "易方达基金管理有限公司",
+        "centrality": 0.8441558441558442
+      },
+      {
+        "institution_id": "mutual_fund_386373",
+        "name": "建信基金管理有限责任公司",
+        "centrality": 0.8311688311688312
+      },
+      {
+        "institution_id": "mutual_fund_337903",
+        "name": "博时基金管理有限公司",
+        "centrality": 0.8181818181818182
+      },
+      {
+        "institution_id": "securities_firm_322387",
+        "name": "东方财富证券股份有限公司武汉营业部",
+        "centrality": 0.7792207792207793
+      },
+      {
+        "institution_id": "securities_firm_406246",
+        "name": "国泰君安证券股份有限公司上海营业部",
+        "centrality": 0.7792207792207793
+      },
+      {
+        "institution_id": "securities_firm_407483",
+        "name": "中信证券股份有限公司北京营业部",
+        "centrality": 0.7792207792207793
+      },
+      {
+        "institution_id": "securities_firm_713002",
+        "name": "广发证券股份有限公司北京营业部",
+        "centrality": 0.7662337662337663
+      }
+    ],
+    "by_betweenness_centrality": [
+      {
+        "institution_id": "mutual_fund_741508",
+        "name": "嘉实基金管理有限公司",
+        "centrality": 0.01158993519592851
+      },
+      {
+        "institution_id": "securities_firm_407483",
+        "name": "中信证券股份有限公司北京营业部",
+        "centrality": 0.011130750648891026
+      },
+      {
+        "institution_id": "securities_firm_953136",
+        "name": "中信证券股份有限公司成都营业部",
+        "centrality": 0.010534336259175155
+      },
+      {
+        "institution_id": "securities_firm_640957",
+        "name": "华泰证券股份有限公司成都营业部",
+        "centrality": 0.009806346582189174
+      },
+      {
+        "institution_id": "securities_firm_322387",
+        "name": "东方财富证券股份有限公司武汉营业部",
+        "centrality": 0.00974992786565713
+      },
+      {
+        "institution_id": "securities_firm_149208",
+        "name": "申万宏源证券有限公司广州营业部",
+        "centrality": 0.009648474833766513
+      },
+      {
+        "institution_id": "securities_firm_203400",
+        "name": "招商证券股份有限公司杭州营业部",
+        "centrality": 0.009046987726270122
+      },
+      {
+        "institution_id": "mutual_fund_660067",
+        "name": "华夏基金管理有限公司",
+        "centrality": 0.008968284696549264
+      },
+      {
+        "institution_id": "securities_firm_474864",
+        "name": "申万宏源证券有限公司北京营业部",
+        "centrality": 0.008859740250619511
+      },
+      {
+        "institution_id": "mutual_fund_740931",
+        "name": "易方达基金管理有限公司",
+        "centrality": 0.008858975538282724
+      }
+    ]
+  },
+  "distributions": {
+    "institution_types": {
+      "securities_firm": 69,
+      "mutual_fund": 8,
+      "other": 1
+    },
+    "relationship_types": {
+      "same_stock_activity": 1433,
+      "coordinated_trading": 424
+    }
+  },
+  "coordinated_patterns": 0
+}
