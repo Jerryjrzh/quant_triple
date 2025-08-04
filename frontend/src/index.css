@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 自定义样式 */
+.app-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.main-content {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.search-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.error-container {
+  text-align: center;
+  padding: 40px;
+  color: #ff4d4f;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+  
+  .chart-container,
+  .search-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Ant Design 主题定制 */
+.ant-layout-header {
+  background: #001529;
+  padding: 0 24px;
+}
+
+.ant-layout-header .logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.ant-menu-dark.ant-menu-horizontal {
+  line-height: 64px;
+}
+
+/* 图表样式 */
+.plotly-chart {
+  width: 100%;
+  height: 500px;
+}
+
+@media (max-width: 768px) {
+  .plotly-chart {
+    height: 400px;
+  }
+}
+
+/* 股票搜索样式 */
+.stock-search {
+  margin-bottom: 16px;
+}
+
+.stock-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.year-selector {
+  margin-bottom: 16px;
+}
+
+/* 加载和错误状态 */
+.loading-spinner {
+  text-align: center;
+  padding: 50px;
+}
+
+.error-message {
+  color: #ff4d4f;
+  text-align: center;
+  padding: 20px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+
+/* 工具栏样式 */
+.chart-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 576px) {
+  .chart-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
