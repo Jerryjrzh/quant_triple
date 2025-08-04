@@ -43,12 +43,19 @@ A comprehensive stock analysis system that leverages calendar-based temporal ana
 
 ### ✅ Production-Ready Infrastructure (Implemented)
 - **FastAPI Backend**: High-performance async API with JWT authentication and rate limiting
+- **React Frontend**: Modern TypeScript-based UI with Ant Design components and Plotly.js visualization
 - **PostgreSQL Database**: Robust data storage with Alembic migrations and connection pooling
 - **Redis Caching**: Performance optimization with intelligent caching strategies
 - **Docker Support**: Complete containerization for easy deployment
 
+### ✅ Interactive Web Interface (Recently Fixed)
+- **React Frontend**: TypeScript-based modern UI with responsive design
+- **Real-time Charts**: Plotly.js integration for interactive Spring Festival analysis
+- **Stock Search**: Intelligent stock search with autocomplete functionality
+- **Chart Controls**: Dynamic chart configuration and export capabilities
+
 ### 🚧 Planned Features (In Development)
-- **Interactive Visualizations**: WebGL-accelerated charts with Spring Festival overlays
+- **Advanced Visualizations**: WebGL-accelerated charts with Spring Festival overlays
 - **Institutional Fund Tracking**: Dragon-tiger list analysis and attention scoring
 - **Advanced Risk Management**: Dynamic VaR calculation and seasonal risk assessment
 - **Multi-Dimensional Screening**: Technical, seasonal, and institutional factor screening
@@ -60,7 +67,7 @@ The system follows a four-layer architecture:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                 Presentation Layer                          │
-│  React UI • Interactive Charts • Real-time Dashboards      │
+│  React 18 + TypeScript • Ant Design • Plotly.js Charts    │
 ├─────────────────────────────────────────────────────────────┤
 │                 Application Layer                           │
 │  FastAPI • Stock Pool Manager • Alert Engine • API Gateway │
@@ -130,7 +137,7 @@ The system follows a four-layer architecture:
    DB_HOST=localhost DB_PORT=5432 DB_NAME=stock_analysis DB_USER=postgres DB_PASSWORD=password alembic upgrade head
    ```
 
-6. **启动应用程序**
+6. **启动后端服务**
    ```bash
    # 方式1: 使用智能启动脚本 (推荐)
    python start_server.py
@@ -143,7 +150,15 @@ The system follows a four-layer architecture:
    make start-server # 启动 API 服务器
    ```
 
-7. **验证安装**
+7. **启动前端界面** (可选)
+   ```bash
+   # 在新终端中启动前端
+   cd frontend
+   npm install  # 首次运行需要安装依赖
+   npm start    # 启动React开发服务器
+   ```
+
+8. **验证安装**
    ```bash
    # 测试 API 端点
    python test_api.py
@@ -155,7 +170,10 @@ The system follows a four-layer architecture:
    curl http://localhost:8000/health
    ```
 
-**🎉 成功！** 系统现在运行在 http://localhost:8000
+**🎉 成功！** 
+- 后端API运行在: http://localhost:8000
+- 前端界面运行在: http://localhost:3000 (如果启动了前端)
+- API文档访问: http://localhost:8000/docs
 
 ### 可用的 Make 命令
 
@@ -169,6 +187,11 @@ make docker-status   # 查看 Docker 服务状态
 make start-server    # 启动 API 服务器 (智能脚本)
 make run-dev         # 启动开发服务器
 make test-api        # 测试 API 端点
+
+# 前端管理
+make frontend-install # 安装前端依赖
+make frontend-start   # 启动前端开发服务器
+make frontend-build   # 构建前端生产版本
 
 # 数据库管理
 make db-upgrade      # 运行数据库迁移
@@ -226,6 +249,23 @@ pip install -r requirements.txt
 
 # 验证环境变量
 python -c "from config.settings import get_settings; print(get_settings().database.url)"
+```
+
+#### 前端启动问题
+```bash
+# 如果遇到 "react-scripts: not found" 错误
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+
+# 如果遇到 TypeScript 编译错误
+npm run build  # 检查编译错误详情
+
+# 如果端口3000被占用
+PORT=3001 npm start
+
+# 查看详细的前端修复指南
+cat FRONTEND_SETUP.md
 ```
 
 ### 系统架构验证
