@@ -1,0 +1,31 @@
+{
+  "strategy_name": "Enhanced Momentum Strategy",
+  "test_period": "2022-01-01 to 2023-12-31",
+  "performance_metrics": {
+    "total_return": "-1.66%",
+    "annual_return": "-0.81%",
+    "volatility": "2.87%",
+    "sharpe_ratio": "-1.31",
+    "max_drawdown": "-4.26%",
+    "total_trades": 22,
+    "win_rate": "45.45%"
+  },
+  "visualization_features": {
+    "comprehensive_charts_created": 7,
+    "dashboard_components": 8,
+    "individual_charts_saved": 7,
+    "html_dashboard_exported": true
+  },
+  "files_created": {
+    "html_dashboard": "output/comprehensive_backtesting_dashboard.html",
+    "individual_charts": {
+      "equity_curve": "output/equity_curve_chart.html",
+      "performance_attribution": "output/performance_attribution_chart.html",
+      "trade_analysis": "output/trade_analysis_chart.html",
+      "risk_metrics": "output/risk_metrics_chart.html",
+      "monthly_returns": "output/monthly_returns_chart.html",
+      "benchmark_comparison": "output/benchmark_comparison_chart.html",
+      "rolling_metrics": "output/rolling_metrics_chart.html"
+    }
+  }
+}

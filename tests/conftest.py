@@ -12,12 +12,13 @@ from sqlalchemy.orm import sessionmaker
 
 from stock_analysis_system.core.database import Base, get_db_session
 
-
 # Test database URL
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL", "postgresql://postgres:password@localhost/test_stock_analysis"
 )
-TEST_ASYNC_DATABASE_URL = TEST_DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+TEST_ASYNC_DATABASE_URL = TEST_DATABASE_URL.replace(
+    "postgresql://", "postgresql+asyncpg://"
+)
 
 
 @pytest.fixture(scope="session")
@@ -62,7 +63,7 @@ async def async_db_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
     async_session = sessionmaker(
         async_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
         await session.rollback()

@@ -5,13 +5,13 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy import (
+    JSON,
     BigInteger,
     Boolean,
     Column,
     Date,
     DateTime,
     Integer,
-    JSON,
     Numeric,
     String,
     Text,
@@ -129,9 +129,7 @@ class StockPoolMember(Base):
     """Stock pool membership model."""
 
     __tablename__ = "stock_pool_members"
-    __table_args__ = (
-        UniqueConstraint("pool_id", "stock_code", name="uq_pool_member"),
-    )
+    __table_args__ = (UniqueConstraint("pool_id", "stock_code", name="uq_pool_member"),)
 
     id = Column(Integer, primary_key=True, index=True)
     pool_id = Column(Integer, nullable=False, index=True)
