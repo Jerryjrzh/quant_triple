@@ -1,0 +1,201 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-analysis-api
+  namespace: stock-analysis-system
+  labels:
+    app: stock-analysis-api
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stock-analysis-api
+  template:
+    metadata:
+      labels:
+        app: stock-analysis-api
+        component: backend
+    spec:
+      containers:
+      - name: api
+        image: stock-analysis-system:latest
+        ports:
+        - containerPort: 8000
+        env:
+        # Configuration from ConfigMap
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_NAME
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_PORT
+        - name: API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: API_HOST
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: API_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: LOG_LEVEL
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: ENVIRONMENT
+        
+        # Secrets
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_PASSWORD
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: JWT_SECRET_KEY
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: REDIS_PASSWORD
+        - name: TUSHARE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: TUSHARE_API_KEY
+        - name: AKSHARE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: AKSHARE_API_KEY
+        
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        
+        # Volume mounts for temporary files
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: cache-volume
+          mountPath: /app/cache
+      
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 1Gi
+      
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+      
+      # Service account
+      serviceAccountName: stock-analysis-api
+      
+      # Node affinity for better distribution
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - stock-analysis-api
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-analysis-api
+  namespace: stock-analysis-system
+  labels:
+    app: stock-analysis-api
+    component: backend
+spec:
+  selector:
+    app: stock-analysis-api
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: stock-analysis-api
+  namespace: stock-analysis-system
+  labels:
+    app: stock-analysis-api
+    component: backend

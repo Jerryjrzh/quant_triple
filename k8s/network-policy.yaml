@@ -1,0 +1,162 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: stock-analysis-network-policy
+  namespace: stock-analysis-system
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from nginx proxy to API
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-proxy
+    to:
+    - podSelector:
+        matchLabels:
+          app: stock-analysis-api
+    ports:
+    - protocol: TCP
+      port: 8000
+  
+  # Allow ingress from nginx proxy to frontend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-proxy
+    to:
+    - podSelector:
+        matchLabels:
+          app: stock-analysis-frontend
+    ports:
+    - protocol: TCP
+      port: 3000
+  
+  # Allow ingress from API and workers to database
+  - from:
+    - podSelector:
+        matchLabels:
+          app: stock-analysis-api
+    - podSelector:
+        matchLabels:
+          app: celery-worker
+    to:
+    - podSelector:
+        matchLabels:
+          app: postgresql
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Allow ingress from API and workers to Redis
+  - from:
+    - podSelector:
+        matchLabels:
+          app: stock-analysis-api
+    - podSelector:
+        matchLabels:
+          app: celery-worker
+    - podSelector:
+        matchLabels:
+          app: celery-beat
+    to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  
+  # Allow monitoring access
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 8000  # API metrics
+    - protocol: TCP
+      port: 9090  # Prometheus
+    - protocol: TCP
+      port: 5432  # PostgreSQL metrics
+    - protocol: TCP
+      port: 6379  # Redis metrics
+  
+  egress:
+  # Allow egress to DNS
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  
+  # Allow egress to external APIs (Tushare, AkShare, etc.)
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  
+  # Allow internal communication
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+    - protocol: TCP
+      port: 8000  # API
+    - protocol: TCP
+      port: 3000  # Frontend
+    - protocol: TCP
+      port: 9090  # Prometheus
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-default
+  namespace: stock-analysis-system
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  namespace: stock-analysis-system
+spec:
+  podSelector:
+    matchLabels:
+      component: monitoring
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 9090  # Prometheus
+    - protocol: TCP
+      port: 3000  # Grafana
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 8000  # Scrape API metrics
+    - protocol: TCP
+      port: 5432  # Scrape PostgreSQL metrics
+    - protocol: TCP
+      port: 6379  # Scrape Redis metrics
+    - protocol: UDP
+      port: 53    # DNS
+    - protocol: TCP
+      port: 53    # DNS

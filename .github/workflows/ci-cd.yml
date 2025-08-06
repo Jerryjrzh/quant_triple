@@ -1,0 +1,529 @@
+name: Stock Analysis System CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Code Quality and Security Checks
+  code-quality:
+    name: Code Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 black isort bandit safety mypy
+
+    - name: Code formatting check (Black)
+      run: black --check --diff .
+
+    - name: Import sorting check (isort)
+      run: isort --check-only --diff .
+
+    - name: Linting (flake8)
+      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Type checking (mypy)
+      run: mypy stock_analysis_system --ignore-missing-imports
+
+    - name: Security check (Bandit)
+      run: bandit -r stock_analysis_system -f json -o bandit-report.json
+
+    - name: Dependency vulnerability check (Safety)
+      run: safety check --json --output safety-report.json
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # Unit and Integration Tests
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    needs: code-quality
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio pytest-mock
+
+    - name: Set up test environment
+      run: |
+        export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db
+        export REDIS_URL=redis://localhost:6379/0
+        export JWT_SECRET_KEY=test_secret_key
+        export ENVIRONMENT=test
+
+    - name: Run database migrations
+      run: |
+        export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db
+        alembic upgrade head
+
+    - name: Run unit tests
+      run: |
+        export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db
+        export REDIS_URL=redis://localhost:6379/0
+        pytest tests/unit/ -v --cov=stock_analysis_system --cov-report=xml --cov-report=html --junit-xml=test-results.xml
+
+    - name: Run integration tests
+      run: |
+        export DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db
+        export REDIS_URL=redis://localhost:6379/0
+        pytest tests/integration/ -v --junit-xml=integration-test-results.xml
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          test-results.xml
+          integration-test-results.xml
+          htmlcov/
+          coverage.xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Frontend Tests
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run frontend linting
+      run: |
+        cd frontend
+        npm run lint
+
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm run test -- --coverage --watchAll=false
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+    - name: Upload frontend build
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: frontend/build/
+
+  # Performance Tests
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [test, frontend-test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install locust
+
+    - name: Run performance tests
+      run: |
+        # Start the application in background
+        python start_server.py &
+        sleep 30
+        
+        # Run Locust performance tests
+        locust -f tests/performance/locustfile.py --headless -u 50 -r 10 -t 60s --host=http://localhost:8000 --html=performance-report.html
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-report
+        path: performance-report.html
+
+  # Build and Push Docker Images
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: [test, frontend-test]
+    if: github.event_name == 'push' || github.event_name == 'release'
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+
+    - name: Download frontend build
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-build
+        path: frontend/build/
+
+    - name: Build and push backend image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64,linux/arm64
+
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        platforms: linux/amd64,linux/arm64
+
+  # Security Scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' || github.event_name == 'release'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ needs.build-and-push.outputs.image-tag }}
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-push, security-scan]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Deploy to staging
+      run: |
+        export KUBECONFIG=kubeconfig
+        
+        # Update image tags in deployment files
+        sed -i "s|stock-analysis-system:latest|${{ needs.build-and-push.outputs.image-tag }}|g" k8s/api-deployment.yaml
+        sed -i "s|stock-analysis-frontend:latest|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}|g" k8s/frontend-deployment.yaml
+        
+        # Apply Kubernetes manifests
+        kubectl apply -f k8s/namespace.yaml
+        kubectl apply -f k8s/configmap.yaml
+        kubectl apply -f k8s/secrets.yaml
+        kubectl apply -f k8s/postgresql.yaml
+        kubectl apply -f k8s/redis.yaml
+        kubectl apply -f k8s/api-deployment.yaml
+        kubectl apply -f k8s/frontend-deployment.yaml
+        kubectl apply -f k8s/nginx-deployment.yaml
+        kubectl apply -f k8s/celery-deployment.yaml
+        kubectl apply -f k8s/monitoring.yaml
+        kubectl apply -f k8s/hpa.yaml
+        kubectl apply -f k8s/network-policy.yaml
+        kubectl apply -f k8s/rbac.yaml
+        
+        # Wait for deployment to complete
+        kubectl rollout status deployment/stock-analysis-api -n stock-analysis-system --timeout=600s
+        kubectl rollout status deployment/stock-analysis-frontend -n stock-analysis-system --timeout=600s
+
+    - name: Run smoke tests
+      run: |
+        export KUBECONFIG=kubeconfig
+        
+        # Get service endpoint
+        STAGING_URL=$(kubectl get service nginx-proxy -n stock-analysis-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Run basic smoke tests
+        curl -f http://$STAGING_URL/health || exit 1
+        curl -f http://$STAGING_URL/api/health || exit 1
+
+  # Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push, security-scan]
+    if: github.event_name == 'release'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Blue-Green Deployment
+      run: |
+        export KUBECONFIG=kubeconfig
+        
+        # Create green deployment
+        sed -i "s|stock-analysis-system:latest|${{ needs.build-and-push.outputs.image-tag }}|g" k8s/api-deployment.yaml
+        sed -i "s|stock-analysis-frontend:latest|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}|g" k8s/frontend-deployment.yaml
+        sed -i "s|name: stock-analysis-api|name: stock-analysis-api-green|g" k8s/api-deployment.yaml
+        sed -i "s|name: stock-analysis-frontend|name: stock-analysis-frontend-green|g" k8s/frontend-deployment.yaml
+        
+        # Deploy green version
+        kubectl apply -f k8s/api-deployment.yaml
+        kubectl apply -f k8s/frontend-deployment.yaml
+        
+        # Wait for green deployment
+        kubectl rollout status deployment/stock-analysis-api-green -n stock-analysis-system --timeout=600s
+        kubectl rollout status deployment/stock-analysis-frontend-green -n stock-analysis-system --timeout=600s
+        
+        # Run health checks on green deployment
+        kubectl run health-check --image=curlimages/curl --rm -i --restart=Never -- \
+          curl -f http://stock-analysis-api-green:8000/health
+        
+        # Switch traffic to green (update service selectors)
+        kubectl patch service stock-analysis-api -n stock-analysis-system -p '{"spec":{"selector":{"app":"stock-analysis-api-green"}}}'
+        kubectl patch service stock-analysis-frontend -n stock-analysis-system -p '{"spec":{"selector":{"app":"stock-analysis-frontend-green"}}}'
+        
+        # Wait and verify
+        sleep 30
+        
+        # Clean up old blue deployment
+        kubectl delete deployment stock-analysis-api -n stock-analysis-system --ignore-not-found=true
+        kubectl delete deployment stock-analysis-frontend -n stock-analysis-system --ignore-not-found=true
+        
+        # Rename green to blue for next deployment
+        kubectl patch deployment stock-analysis-api-green -n stock-analysis-system -p '{"metadata":{"name":"stock-analysis-api"}}'
+        kubectl patch deployment stock-analysis-frontend-green -n stock-analysis-system -p '{"metadata":{"name":"stock-analysis-frontend"}}'
+
+    - name: Post-deployment verification
+      run: |
+        export KUBECONFIG=kubeconfig
+        
+        # Get production URL
+        PROD_URL=$(kubectl get service nginx-proxy -n stock-analysis-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Run comprehensive health checks
+        curl -f http://$PROD_URL/health || exit 1
+        curl -f http://$PROD_URL/api/health || exit 1
+        curl -f http://$PROD_URL/api/stocks/search?q=AAPL || exit 1
+
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        export KUBECONFIG=kubeconfig
+        
+        # Rollback to previous version
+        kubectl rollout undo deployment/stock-analysis-api -n stock-analysis-system
+        kubectl rollout undo deployment/stock-analysis-frontend -n stock-analysis-system
+        
+        # Wait for rollback
+        kubectl rollout status deployment/stock-analysis-api -n stock-analysis-system --timeout=300s
+        kubectl rollout status deployment/stock-analysis-frontend -n stock-analysis-system --timeout=300s
+
+  # Notify on completion
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+
+    steps:
+    - name: Notify Slack on success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#deployments'
+        text: |
+          ✅ Stock Analysis System deployment successful!
+          
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+          
+          🔗 View deployment: https://stockanalysis.example.com
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Notify Slack on failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#deployments'
+        text: |
+          ❌ Stock Analysis System deployment failed!
+          
+          Branch: ${{ github.ref }}
+          Commit: ${{ github.sha }}
+          Author: ${{ github.actor }}
+          
+          🔗 View logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Create GitHub deployment status
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const deployment = await github.rest.repos.createDeployment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.sha,
+            environment: context.eventName === 'release' ? 'production' : 'staging',
+            description: 'Automated deployment via GitHub Actions'
+          });
+          
+          await github.rest.repos.createDeploymentStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            deployment_id: deployment.data.id,
+            state: '${{ job.status }}' === 'success' ? 'success' : 'failure',
+            description: 'Deployment ${{ job.status }}'
+          });

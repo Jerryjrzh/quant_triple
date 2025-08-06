@@ -1,0 +1,124 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: stock-analysis-system
+  name: stock-analysis-role
+rules:
+# Allow reading pods and services for service discovery
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+# Allow reading configmaps and secrets
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+# Allow creating events for logging
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: stock-analysis-rolebinding
+  namespace: stock-analysis-system
+subjects:
+- kind: ServiceAccount
+  name: stock-analysis-api
+  namespace: stock-analysis-system
+- kind: ServiceAccount
+  name: celery-worker
+  namespace: stock-analysis-system
+- kind: ServiceAccount
+  name: celery-beat
+  namespace: stock-analysis-system
+roleRef:
+  kind: Role
+  name: stock-analysis-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-cluster-role
+rules:
+# Allow Prometheus to scrape metrics from all pods
+- apiGroups: [""]
+  resources: ["nodes", "nodes/proxy", "services", "endpoints", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-cluster-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: stock-analysis-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: stock-analysis-system
+  labels:
+    app: prometheus
+    component: monitoring
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: stock-analysis-system
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: stock-analysis-authz
+  namespace: stock-analysis-system
+spec:
+  rules:
+  # Allow nginx proxy to access API and frontend
+  - from:
+    - source:
+        principals: ["cluster.local/ns/stock-analysis-system/sa/nginx-proxy"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  
+  # Allow API to access database and cache
+  - from:
+    - source:
+        principals: ["cluster.local/ns/stock-analysis-system/sa/stock-analysis-api"]
+    to:
+    - operation:
+        ports: ["5432", "6379"]
+  
+  # Allow workers to access database and cache
+  - from:
+    - source:
+        principals: ["cluster.local/ns/stock-analysis-system/sa/celery-worker"]
+    to:
+    - operation:
+        ports: ["5432", "6379"]
+  
+  # Allow monitoring access
+  - from:
+    - source:
+        principals: ["cluster.local/ns/stock-analysis-system/sa/prometheus"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/metrics", "/health"]

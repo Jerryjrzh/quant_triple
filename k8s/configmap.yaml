@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stock-analysis-config
+  namespace: stock-analysis-system
+data:
+  # Database configuration
+  DATABASE_HOST: "postgresql-service"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "stock_analysis"
+  
+  # Redis configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # API configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  API_WORKERS: "4"
+  
+  # Monitoring configuration
+  PROMETHEUS_PORT: "8001"
+  GRAFANA_PORT: "3000"
+  
+  # Application settings
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  
+  # External API settings
+  TUSHARE_API_TIMEOUT: "30"
+  AKSHARE_API_TIMEOUT: "30"
+  
+  # ML Model settings
+  MODEL_CACHE_SIZE: "1000"
+  MODEL_BATCH_SIZE: "32"
+  
+  # Security settings
+  JWT_ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  
+  # GDPR settings
+  GDPR_RETENTION_DAYS: "2555"
+  GDPR_REQUEST_RESPONSE_DAYS: "30"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: stock-analysis-system
+data:
+  nginx.conf: |
+    upstream api_backend {
+        server stock-analysis-api:8000;
+    }
+    
+    upstream frontend_backend {
+        server stock-analysis-frontend:3000;
+    }
+    
+    server {
+        listen 80;
+        server_name _;
+        
+        # Frontend routes
+        location / {
+            proxy_pass http://frontend_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # API routes
+        location /api/ {
+            proxy_pass http://api_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # CORS headers
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization";
+            
+            if ($request_method = 'OPTIONS') {
+                add_header Access-Control-Allow-Origin *;
+                add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+                add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization";
+                add_header Access-Control-Max-Age 1728000;
+                add_header Content-Type 'text/plain; charset=utf-8';
+                add_header Content-Length 0;
+                return 204;
+            }
+        }
+        
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }

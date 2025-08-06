@@ -675,8 +675,10 @@ async def get_alerts(
 
 # Include routers
 from stock_analysis_system.api.visualization import router as visualization_router
+from stock_analysis_system.api.cost_management_endpoints import router as cost_management_router
 
 app.include_router(visualization_router)
+app.include_router(cost_management_router)
 
 
 # Error handlers

@@ -1,0 +1,420 @@
+{
+  "share_info": {
+    "share_id": "0232c69f4e62563a806299ffb1635d76",
+    "pool_id": "watchlist_20250805_101653",
+    "pool_name": "Tech Watchlist",
+    "access_level": "read_only",
+    "created_timestamp": "2025-08-05T10:16:53.188130",
+    "expiry_timestamp": "2025-09-04T10:16:53.188135",
+    "include_analytics": true
+  },
+  "pool_data": {
+    "pool_info": {
+      "pool_id": "watchlist_20250805_101653",
+      "name": "Tech Watchlist",
+      "pool_type": "watchlist",
+      "description": "Technology stocks to monitor",
+      "created_date": "2025-08-05T10:16:53.047228",
+      "last_modified": "2025-08-05T10:16:53.096261",
+      "status": "active",
+      "max_stocks": 20,
+      "rebalance_frequency": "monthly"
+    },
+    "stocks": [
+      {
+        "symbol": "AAPL",
+        "name": "Apple Inc.",
+        "added_date": "2025-08-05T10:16:53.047422",
+        "added_price": 92.15722673826127,
+        "current_price": 92.15722673826127,
+        "weight": 0.2,
+        "notes": "iPhone maker, strong ecosystem",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "GOOGL",
+        "name": "Alphabet Inc.",
+        "added_date": "2025-08-05T10:16:53.047462",
+        "added_price": 101.04270903498433,
+        "current_price": 101.04270903498433,
+        "weight": 0.18,
+        "notes": "Search and cloud dominance",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "MSFT",
+        "name": "Microsoft Corp.",
+        "added_date": "2025-08-05T10:16:53.047662",
+        "added_price": 99.94537332738486,
+        "current_price": 99.94537332738486,
+        "weight": 0.15,
+        "notes": "Enterprise software leader",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "TSLA",
+        "name": "Tesla Inc.",
+        "added_date": "2025-08-05T10:16:53.047717",
+        "added_price": 100.21374001101042,
+        "current_price": 100.21374001101042,
+        "weight": 0.12,
+        "notes": "EV and energy innovation",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "NVDA",
+        "name": "NVIDIA Corp.",
+        "added_date": "2025-08-05T10:16:53.047748",
+        "added_price": 107.95957792326799,
+        "current_price": 107.95957792326799,
+        "weight": 0.1,
+        "notes": "AI and GPU technology",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "META",
+        "name": "Meta Platforms",
+        "added_date": "2025-08-05T10:16:53.047775",
+        "added_price": 92.24409721653296,
+        "current_price": 92.24409721653296,
+        "weight": 0.08,
+        "notes": "Social media and metaverse",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "AMZN",
+        "name": "Amazon.com Inc.",
+        "added_date": "2025-08-05T10:16:53.047800",
+        "added_price": 104.89065950716872,
+        "current_price": 104.89065950716872,
+        "weight": 0.17,
+        "notes": "E-commerce and AWS",
+        "tags": [
+          "tech",
+          "large-cap"
+        ],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "CRM",
+        "name": "Salesforce Inc.",
+        "added_date": "2025-08-05T10:16:53.096152",
+        "added_price": 106.59483607414404,
+        "current_price": 106.59483607414404,
+        "weight": 0.0,
+        "notes": "Added from screening on 2025-08-05",
+        "tags": [],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "ADBE",
+        "name": "Adobe Inc.",
+        "added_date": "2025-08-05T10:16:53.096222",
+        "added_price": 94.12842543521207,
+        "current_price": 94.12842543521207,
+        "weight": 0.0,
+        "notes": "Added from screening on 2025-08-05",
+        "tags": [],
+        "return_pct": 0.0
+      },
+      {
+        "symbol": "NOW",
+        "name": "ServiceNow Inc.",
+        "added_date": "2025-08-05T10:16:53.096259",
+        "added_price": 90.21991657316961,
+        "current_price": 90.21991657316961,
+        "weight": 0.0,
+        "notes": "Added from screening on 2025-08-05",
+        "tags": [],
+        "return_pct": 0.0
+      }
+    ],
+    "metrics": {
+      "total_return": 0.0,
+      "annualized_return": 0.0,
+      "volatility": 0.0,
+      "sharpe_ratio": 0.0,
+      "max_drawdown": 0.0,
+      "win_rate": 0.0,
+      "avg_holding_period": 0.0,
+      "sector_concentration": {},
+      "risk_score": 0.0,
+      "last_updated": "2025-08-05 10:16:53.187326"
+    },
+    "auto_update_rules": {},
+    "analytics": {
+      "basic_info": {
+        "pool_id": "watchlist_20250805_101653",
+        "name": "Tech Watchlist",
+        "type": "watchlist",
+        "status": "active",
+        "total_stocks": 10,
+        "created_date": "2025-08-05T10:16:53.047228",
+        "last_modified": "2025-08-05T10:16:53.096261"
+      },
+      "performance_metrics": {
+        "total_return": 0.0,
+        "annualized_return": 0.0,
+        "volatility": 0.0,
+        "sharpe_ratio": 0.0,
+        "max_drawdown": 0.0,
+        "win_rate": 0.0,
+        "avg_holding_period": 0.0,
+        "sector_concentration": {},
+        "risk_score": 0.0,
+        "last_updated": "2025-08-05 10:16:53.188266"
+      },
+      "stock_analysis": {
+        "top_performers": [
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "return": 0.0,
+            "weight": 0.2,
+            "added_date": "2025-08-05 10:16:53.047422"
+          },
+          {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc.",
+            "return": 0.0,
+            "weight": 0.18,
+            "added_date": "2025-08-05 10:16:53.047462"
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "return": 0.0,
+            "weight": 0.15,
+            "added_date": "2025-08-05 10:16:53.047662"
+          },
+          {
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "return": 0.0,
+            "weight": 0.12,
+            "added_date": "2025-08-05 10:16:53.047717"
+          },
+          {
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp.",
+            "return": 0.0,
+            "weight": 0.1,
+            "added_date": "2025-08-05 10:16:53.047748"
+          }
+        ],
+        "worst_performers": [
+          {
+            "symbol": "META",
+            "name": "Meta Platforms",
+            "return": 0.0,
+            "weight": 0.08,
+            "added_date": "2025-08-05 10:16:53.047775"
+          },
+          {
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "return": 0.0,
+            "weight": 0.17,
+            "added_date": "2025-08-05 10:16:53.047800"
+          },
+          {
+            "symbol": "CRM",
+            "name": "Salesforce Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096152"
+          },
+          {
+            "symbol": "ADBE",
+            "name": "Adobe Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096222"
+          },
+          {
+            "symbol": "NOW",
+            "name": "ServiceNow Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096259"
+          }
+        ],
+        "recent_additions": [
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "return": 0.0,
+            "weight": 0.2,
+            "added_date": "2025-08-05 10:16:53.047422"
+          },
+          {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc.",
+            "return": 0.0,
+            "weight": 0.18,
+            "added_date": "2025-08-05 10:16:53.047462"
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "return": 0.0,
+            "weight": 0.15,
+            "added_date": "2025-08-05 10:16:53.047662"
+          },
+          {
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "return": 0.0,
+            "weight": 0.12,
+            "added_date": "2025-08-05 10:16:53.047717"
+          },
+          {
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp.",
+            "return": 0.0,
+            "weight": 0.1,
+            "added_date": "2025-08-05 10:16:53.047748"
+          },
+          {
+            "symbol": "META",
+            "name": "Meta Platforms",
+            "return": 0.0,
+            "weight": 0.08,
+            "added_date": "2025-08-05 10:16:53.047775"
+          },
+          {
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "return": 0.0,
+            "weight": 0.17,
+            "added_date": "2025-08-05 10:16:53.047800"
+          },
+          {
+            "symbol": "CRM",
+            "name": "Salesforce Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096152"
+          },
+          {
+            "symbol": "ADBE",
+            "name": "Adobe Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096222"
+          },
+          {
+            "symbol": "NOW",
+            "name": "ServiceNow Inc.",
+            "return": 0.0,
+            "weight": 0.0,
+            "added_date": "2025-08-05 10:16:53.096259"
+          }
+        ],
+        "high_weight_stocks": [
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "return": 0.0,
+            "weight": 0.2,
+            "added_date": "2025-08-05 10:16:53.047422"
+          },
+          {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc.",
+            "return": 0.0,
+            "weight": 0.18,
+            "added_date": "2025-08-05 10:16:53.047462"
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp.",
+            "return": 0.0,
+            "weight": 0.15,
+            "added_date": "2025-08-05 10:16:53.047662"
+          },
+          {
+            "symbol": "TSLA",
+            "name": "Tesla Inc.",
+            "return": 0.0,
+            "weight": 0.12,
+            "added_date": "2025-08-05 10:16:53.047717"
+          },
+          {
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp.",
+            "return": 0.0,
+            "weight": 0.1,
+            "added_date": "2025-08-05 10:16:53.047748"
+          },
+          {
+            "symbol": "META",
+            "name": "Meta Platforms",
+            "return": 0.0,
+            "weight": 0.08,
+            "added_date": "2025-08-05 10:16:53.047775"
+          },
+          {
+            "symbol": "AMZN",
+            "name": "Amazon.com Inc.",
+            "return": 0.0,
+            "weight": 0.17,
+            "added_date": "2025-08-05 10:16:53.047800"
+          }
+        ]
+      },
+      "risk_analysis": {
+        "concentration_risk": 0.18460000000000001,
+        "sector_concentration": {},
+        "volatility_analysis": {},
+        "risk_score": 18.46
+      },
+      "sector_analysis": {
+        "sector_distribution": {
+          "Technology": 0.28,
+          "Healthcare": 0.35,
+          "Finance": 0.25,
+          "Consumer": 0.22,
+          "Industrial": 0.2
+        },
+        "diversification_score": 100.0,
+        "dominant_sector": [
+          "Healthcare",
+          0.35
+        ]
+      },
+      "recommendations": [
+        {
+          "type": "maintenance",
+          "priority": "low",
+          "message": "Consider rebalancing based on monthly schedule",
+          "action": "rebalance"
+        }
+      ]
+    }
+  }
+}

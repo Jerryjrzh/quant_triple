@@ -1,0 +1,1309 @@
+{
+  "test_execution": {
+    "start_time": "2025-08-05T14:19:55.472379",
+    "end_time": null,
+    "total_duration": 0,
+    "overall_coverage": 0.0
+  },
+  "test_suites": {
+    "integration_tests": {
+      "total_tests": 8,
+      "passed_tests": 8,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "error_tests": 0,
+      "total_duration": 1.2357258796691895,
+      "coverage_percent": 85.0,
+      "timestamp": "2025-08-05T14:19:56.715580",
+      "test_results": [
+        {
+          "test_name": "_test_api_database_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.10507345199584961,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:55.584953"
+        },
+        {
+          "test_name": "_test_etl_pipeline_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.20043325424194336,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:55.785432"
+        },
+        {
+          "test_name": "_test_ml_model_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.3069572448730469,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.092429"
+        },
+        {
+          "test_name": "_test_monitoring_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.10278844833374023,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.195256"
+        },
+        {
+          "test_name": "_test_authentication_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.10040569305419922,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.295700"
+        },
+        {
+          "test_name": "_test_data_source_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.20853543281555176,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.504274"
+        },
+        {
+          "test_name": "_test_cache_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.10568594932556152,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.609985"
+        },
+        {
+          "test_name": "_test_notification_integration",
+          "test_type": "integration",
+          "status": "passed",
+          "duration": 0.10555553436279297,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:19:56.715555"
+        }
+      ]
+    },
+    "unit_tests": {
+      "total_tests": 100,
+      "passed_tests": 90,
+      "failed_tests": 10,
+      "skipped_tests": 0,
+      "error_tests": 0,
+      "total_duration": 5.863742113113403,
+      "coverage_percent": 92.5,
+      "timestamp": "2025-08-05T14:20:01.343560",
+      "test_results": [
+        {
+          "test_name": "test_data_source_manager::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343340"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343349"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343351"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343353"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343354"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343356"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343357"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343358"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343359"
+        },
+        {
+          "test_name": "test_data_source_manager::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_data_source_manager::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343362"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343364"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343365"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343366"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343367"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343368"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343370"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343371"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343372"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343373"
+        },
+        {
+          "test_name": "test_data_quality_engine::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_data_quality_engine::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343375"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343377"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343378"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343379"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343381"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343382"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343384"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343385"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343386"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343388"
+        },
+        {
+          "test_name": "test_etl_pipeline::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_etl_pipeline::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343390"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343392"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343393"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343395"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343397"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343399"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343401"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343402"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343404"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343406"
+        },
+        {
+          "test_name": "test_spring_festival_engine::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_spring_festival_engine::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343407"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343410"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343411"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343413"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343415"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343417"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343418"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343420"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343422"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343424"
+        },
+        {
+          "test_name": "test_risk_management_engine::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_risk_management_engine::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343425"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343427"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343429"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343430"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343432"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343434"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343435"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343437"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343439"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343440"
+        },
+        {
+          "test_name": "test_institutional_analysis::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_institutional_analysis::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343442"
+        },
+        {
+          "test_name": "test_ml_models::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343444"
+        },
+        {
+          "test_name": "test_ml_models::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343446"
+        },
+        {
+          "test_name": "test_ml_models::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343447"
+        },
+        {
+          "test_name": "test_ml_models::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343449"
+        },
+        {
+          "test_name": "test_ml_models::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343450"
+        },
+        {
+          "test_name": "test_ml_models::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343452"
+        },
+        {
+          "test_name": "test_ml_models::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343454"
+        },
+        {
+          "test_name": "test_ml_models::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343455"
+        },
+        {
+          "test_name": "test_ml_models::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343457"
+        },
+        {
+          "test_name": "test_ml_models::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_ml_models::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343459"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343461"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343463"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343464"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343466"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343468"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343469"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343471"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343473"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343475"
+        },
+        {
+          "test_name": "test_api_endpoints::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_api_endpoints::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343477"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343479"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343480"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343482"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343484"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343485"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343487"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343489"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343490"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343491"
+        },
+        {
+          "test_name": "test_monitoring_stack::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_monitoring_stack::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343493"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_5",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.15000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343495"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_6",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.16,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343497"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_7",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.17,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343498"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_8",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.18,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343500"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_9",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.19,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343502"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_10",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.2,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343504"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_11",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.21000000000000002,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343505"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_12",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.22,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343507"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_13",
+          "test_type": "unit",
+          "status": "passed",
+          "duration": 0.23,
+          "error_message": null,
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343509"
+        },
+        {
+          "test_name": "test_performance_monitoring::test_case_14",
+          "test_type": "unit",
+          "status": "failed",
+          "duration": 0.24000000000000002,
+          "error_message": "Mock error in test_performance_monitoring::test_case_14",
+          "coverage_percent": 92.5,
+          "performance_metrics": {},
+          "timestamp": "2025-08-05T14:20:01.343511"
+        }
+      ]
+    },
+    "performance_tests": {
+      "total_tests": 7,
+      "passed_tests": 7,
+      "failed_tests": 0,
+      "skipped_tests": 0,
+      "error_tests": 0,
+      "total_duration": 9.122921228408813,
+      "coverage_percent": 0.0,
+      "timestamp": "2025-08-05T14:20:04.603261",
+      "test_results": [
+        {
+          "test_name": "_test_api_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 1.005082607269287,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "requests_per_second": 1000,
+            "average_response_time": 0.2,
+            "p95_response_time": 0.5,
+            "error_rate": 0.1
+          },
+          "timestamp": "2025-08-05T14:19:56.485431"
+        },
+        {
+          "test_name": "_test_database_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 0.8056466579437256,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "queries_per_second": 500,
+            "average_query_time": 0.05,
+            "connection_pool_usage": 0.7
+          },
+          "timestamp": "2025-08-05T14:19:57.291100"
+        },
+        {
+          "test_name": "_test_ml_model_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 2.006622552871704,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "predictions_per_second": 100,
+            "model_accuracy": 0.92,
+            "inference_time": 0.01
+          },
+          "timestamp": "2025-08-05T14:19:59.297744"
+        },
+        {
+          "test_name": "_test_data_processing_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 1.505122423171997,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "records_per_second": 10000,
+            "processing_latency": 0.1,
+            "memory_usage_mb": 512
+          },
+          "timestamp": "2025-08-05T14:20:00.802888"
+        },
+        {
+          "test_name": "_test_concurrent_user_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 3.0000851154327393,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "concurrent_users": 1000,
+            "session_duration": 300,
+            "resource_utilization": 0.8
+          },
+          "timestamp": "2025-08-05T14:20:03.803007"
+        },
+        {
+          "test_name": "_test_memory_usage_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 0.5000326633453369,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "peak_memory_mb": 2048,
+            "memory_growth_rate": 0.1,
+            "gc_frequency": 10
+          },
+          "timestamp": "2025-08-05T14:20:04.303068"
+        },
+        {
+          "test_name": "_test_cache_performance",
+          "test_type": "performance",
+          "status": "passed",
+          "duration": 0.30010485649108887,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "cache_hit_rate": 0.95,
+            "cache_response_time": 0.001,
+            "cache_memory_usage": 1024
+          },
+          "timestamp": "2025-08-05T14:20:04.603206"
+        }
+      ]
+    },
+    "chaos_tests": {
+      "total_tests": 6,
+      "passed_tests": 4,
+      "failed_tests": 2,
+      "skipped_tests": 0,
+      "error_tests": 0,
+      "total_duration": 12.121362686157227,
+      "coverage_percent": 0.0,
+      "timestamp": "2025-08-05T14:20:07.601972",
+      "test_results": [
+        {
+          "test_name": "_test_database_failure_resilience",
+          "test_type": "chaos",
+          "status": "passed",
+          "duration": 2.009948253631592,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.85
+          },
+          "timestamp": "2025-08-05T14:19:57.490578"
+        },
+        {
+          "test_name": "_test_api_server_failure_resilience",
+          "test_type": "chaos",
+          "status": "passed",
+          "duration": 1.5060508251190186,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.9
+          },
+          "timestamp": "2025-08-05T14:19:58.996696"
+        },
+        {
+          "test_name": "_test_cache_failure_resilience",
+          "test_type": "chaos",
+          "status": "passed",
+          "duration": 1.1040844917297363,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.95
+          },
+          "timestamp": "2025-08-05T14:20:00.100823"
+        },
+        {
+          "test_name": "_test_network_partition_resilience",
+          "test_type": "chaos",
+          "status": "failed",
+          "duration": 3.0004959106445312,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.75
+          },
+          "timestamp": "2025-08-05T14:20:03.101361"
+        },
+        {
+          "test_name": "_test_high_load_resilience",
+          "test_type": "chaos",
+          "status": "failed",
+          "duration": 2.5003530979156494,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.8
+          },
+          "timestamp": "2025-08-05T14:20:05.601755"
+        },
+        {
+          "test_name": "_test_memory_pressure_resilience",
+          "test_type": "chaos",
+          "status": "passed",
+          "duration": 2.000117063522339,
+          "error_message": null,
+          "coverage_percent": null,
+          "performance_metrics": {
+            "resilience_score": 0.88
+          },
+          "timestamp": "2025-08-05T14:20:07.601914"
+        }
+      ]
+    }
+  }
+}

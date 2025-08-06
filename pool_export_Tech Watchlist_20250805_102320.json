@@ -1,0 +1,244 @@
+{
+  "pool_info": {
+    "pool_id": "watchlist_20250805_102320",
+    "name": "Tech Watchlist",
+    "pool_type": "watchlist",
+    "description": "",
+    "created_date": "2025-08-05T10:23:20.470692",
+    "last_modified": "2025-08-05T10:23:20.471063",
+    "status": "active",
+    "max_stocks": 100,
+    "rebalance_frequency": "monthly"
+  },
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "added_date": "2025-08-05T10:23:20.470852",
+      "added_price": 100.2704692388385,
+      "current_price": 100.2704692388385,
+      "weight": 0.33,
+      "notes": "",
+      "tags": [],
+      "return_pct": 0.0
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet",
+      "added_date": "2025-08-05T10:23:20.470881",
+      "added_price": 101.4575666458363,
+      "current_price": 101.4575666458363,
+      "weight": 0.33,
+      "notes": "",
+      "tags": [],
+      "return_pct": 0.0
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "added_date": "2025-08-05T10:23:20.471061",
+      "added_price": 105.1341075233014,
+      "current_price": 105.1341075233014,
+      "weight": 0.33,
+      "notes": "",
+      "tags": [],
+      "return_pct": 0.0
+    }
+  ],
+  "metrics": {
+    "total_return": 0.0,
+    "annualized_return": 0.0,
+    "volatility": 0.0,
+    "sharpe_ratio": 0.0,
+    "max_drawdown": 0.0,
+    "win_rate": 0.0,
+    "avg_holding_period": 0.0,
+    "sector_concentration": {},
+    "risk_score": 0.0,
+    "last_updated": "2025-08-05 10:23:20.471266"
+  },
+  "auto_update_rules": {},
+  "analytics": {
+    "basic_info": {
+      "pool_id": "watchlist_20250805_102320",
+      "name": "Tech Watchlist",
+      "type": "watchlist",
+      "status": "active",
+      "total_stocks": 3,
+      "created_date": "2025-08-05T10:23:20.470692",
+      "last_modified": "2025-08-05T10:23:20.471063"
+    },
+    "performance_metrics": {
+      "total_return": 0.0,
+      "annualized_return": 0.0,
+      "volatility": 0.0,
+      "sharpe_ratio": 0.0,
+      "max_drawdown": 0.0,
+      "win_rate": 0.0,
+      "avg_holding_period": 0.0,
+      "sector_concentration": {},
+      "risk_score": 0.0,
+      "last_updated": "2025-08-05 10:23:20.471589"
+    },
+    "stock_analysis": {
+      "top_performers": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470852"
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470881"
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.471061"
+        }
+      ],
+      "worst_performers": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470852"
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470881"
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.471061"
+        }
+      ],
+      "recent_additions": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470852"
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470881"
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.471061"
+        }
+      ],
+      "high_weight_stocks": [
+        {
+          "symbol": "AAPL",
+          "name": "Apple Inc.",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470852"
+        },
+        {
+          "symbol": "GOOGL",
+          "name": "Alphabet",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.470881"
+        },
+        {
+          "symbol": "MSFT",
+          "name": "Microsoft",
+          "return": 0.0,
+          "weight": 0.33,
+          "added_date": "2025-08-05 10:23:20.471061"
+        }
+      ]
+    },
+    "risk_analysis": {
+      "concentration_risk": 0.32670000000000005,
+      "sector_concentration": {},
+      "volatility_analysis": {},
+      "risk_score": 32.67
+    },
+    "sector_analysis": {
+      "sector_distribution": {
+        "Technology": 0.33,
+        "Healthcare": 0.33,
+        "Finance": 0.33
+      },
+      "diversification_score": 60.0,
+      "dominant_sector": [
+        "Technology",
+        0.33
+      ]
+    },
+    "recommendations": [
+      {
+        "type": "diversification",
+        "priority": "high",
+        "message": "Consider adding more stocks to improve diversification",
+        "action": "add_stocks"
+      },
+      {
+        "type": "maintenance",
+        "priority": "low",
+        "message": "Consider rebalancing based on monthly schedule",
+        "action": "rebalance"
+      }
+    ]
+  },
+  "history": [
+    {
+      "timestamp": "2025-08-05T10:23:20.470714",
+      "action": "created",
+      "details": {
+        "name": "Tech Watchlist",
+        "type": "watchlist"
+      }
+    },
+    {
+      "timestamp": "2025-08-05T10:23:20.470872",
+      "action": "stock_added",
+      "details": {
+        "symbol": "AAPL",
+        "price": 100.2704692388385
+      }
+    },
+    {
+      "timestamp": "2025-08-05T10:23:20.471054",
+      "action": "stock_added",
+      "details": {
+        "symbol": "GOOGL",
+        "price": 101.4575666458363
+      }
+    },
+    {
+      "timestamp": "2025-08-05T10:23:20.471092",
+      "action": "stock_added",
+      "details": {
+        "symbol": "MSFT",
+        "price": 105.1341075233014
+      }
+    }
+  ]
+}

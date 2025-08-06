@@ -1,0 +1,11 @@
+symbol,name,added_date,added_price,current_price,weight,notes,tags,return_pct
+AAPL,Apple Inc.,2025-08-05T10:16:53.047422,92.15722673826127,92.15722673826127,0.2,"iPhone maker, strong ecosystem","['tech', 'large-cap']",0.0
+GOOGL,Alphabet Inc.,2025-08-05T10:16:53.047462,101.04270903498433,101.04270903498433,0.18,Search and cloud dominance,"['tech', 'large-cap']",0.0
+MSFT,Microsoft Corp.,2025-08-05T10:16:53.047662,99.94537332738486,99.94537332738486,0.15,Enterprise software leader,"['tech', 'large-cap']",0.0
+TSLA,Tesla Inc.,2025-08-05T10:16:53.047717,100.21374001101042,100.21374001101042,0.12,EV and energy innovation,"['tech', 'large-cap']",0.0
+NVDA,NVIDIA Corp.,2025-08-05T10:16:53.047748,107.95957792326799,107.95957792326799,0.1,AI and GPU technology,"['tech', 'large-cap']",0.0
+META,Meta Platforms,2025-08-05T10:16:53.047775,92.24409721653296,92.24409721653296,0.08,Social media and metaverse,"['tech', 'large-cap']",0.0
+AMZN,Amazon.com Inc.,2025-08-05T10:16:53.047800,104.89065950716872,104.89065950716872,0.17,E-commerce and AWS,"['tech', 'large-cap']",0.0
+CRM,Salesforce Inc.,2025-08-05T10:16:53.096152,106.59483607414404,106.59483607414404,0.0,Added from screening on 2025-08-05,[],0.0
+ADBE,Adobe Inc.,2025-08-05T10:16:53.096222,94.12842543521207,94.12842543521207,0.0,Added from screening on 2025-08-05,[],0.0
+NOW,ServiceNow Inc.,2025-08-05T10:16:53.096259,90.21991657316961,90.21991657316961,0.0,Added from screening on 2025-08-05,[],0.0

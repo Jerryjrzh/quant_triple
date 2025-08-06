@@ -1,0 +1,278 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  namespace: stock-analysis-system
+  labels:
+    app: celery-worker
+    component: worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        component: worker
+    spec:
+      containers:
+      - name: celery-worker
+        image: stock-analysis-system:latest
+        command: ["celery", "-A", "stock_analysis_system.etl.celery_app", "worker", "--loglevel=info", "--concurrency=4"]
+        env:
+        # Configuration from ConfigMap
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_NAME
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: LOG_LEVEL
+        
+        # Secrets
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_PASSWORD
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: REDIS_PASSWORD
+        - name: TUSHARE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: TUSHARE_API_KEY
+        - name: AKSHARE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: AKSHARE_API_KEY
+        
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        
+        # Health checks for Celery worker
+        livenessProbe:
+          exec:
+            command:
+            - celery
+            - -A
+            - stock_analysis_system.etl.celery_app
+            - inspect
+            - ping
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        
+        # Volume mounts
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: cache-volume
+          mountPath: /app/cache
+      
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      - name: cache-volume
+        emptyDir:
+          sizeLimit: 2Gi
+      
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+      
+      # Service account
+      serviceAccountName: celery-worker
+      
+      # Node affinity
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - celery-worker
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: stock-analysis-system
+  labels:
+    app: celery-beat
+    component: scheduler
+spec:
+  replicas: 1  # Only one beat scheduler needed
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+        component: scheduler
+    spec:
+      containers:
+      - name: celery-beat
+        image: stock-analysis-system:latest
+        command: ["celery", "-A", "stock_analysis_system.etl.celery_app", "beat", "--loglevel=info"]
+        env:
+        # Configuration from ConfigMap
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_HOST
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_PORT
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: DATABASE_NAME
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: REDIS_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: stock-analysis-config
+              key: LOG_LEVEL
+        
+        # Secrets
+        - name: DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_USER
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: DATABASE_PASSWORD
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: stock-analysis-secrets
+              key: REDIS_PASSWORD
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        
+        # Volume mounts
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+        - name: beat-schedule
+          mountPath: /app/celerybeat-schedule
+      
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
+      - name: beat-schedule
+        emptyDir: {}
+      
+      # Pod security context
+      securityContext:
+        fsGroup: 1000
+      
+      # Service account
+      serviceAccountName: celery-beat
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: celery-worker
+  namespace: stock-analysis-system
+  labels:
+    app: celery-worker
+    component: worker
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: celery-beat
+  namespace: stock-analysis-system
+  labels:
+    app: celery-beat
+    component: scheduler
