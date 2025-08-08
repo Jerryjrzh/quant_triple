@@ -11,13 +11,13 @@ This module provides comprehensive monitoring capabilities including:
 from .prometheus_metrics import PrometheusMetricsCollector
 from .grafana_dashboards import GrafanaDashboardManager
 from .jaeger_tracing import JaegerTracingManager
-from .elk_logging import ELKLoggingManager
+from .elk_logging import ELKLogger
 from .monitoring_stack import MonitoringStack
 
 __all__ = [
     'PrometheusMetricsCollector',
     'GrafanaDashboardManager', 
     'JaegerTracingManager',
-    'ELKLoggingManager',
+    'ELKLogger',
     'MonitoringStack'
 ]

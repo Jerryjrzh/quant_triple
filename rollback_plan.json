@@ -1,0 +1,48 @@
+{
+  "trigger_conditions": [
+    "系统响应时间超过5秒",
+    "错误率超过5%",
+    "用户投诉增加超过50%",
+    "关键功能不可用",
+    "数据丢失或损坏"
+  ],
+  "rollback_steps": [
+    {
+      "step": 1,
+      "action": "停止新版本部署",
+      "command": "kubectl rollout pause deployment/stock-analysis-api",
+      "estimated_time": "1分钟"
+    },
+    {
+      "step": 2,
+      "action": "切换到上一版本",
+      "command": "kubectl rollout undo deployment/stock-analysis-api",
+      "estimated_time": "3分钟"
+    },
+    {
+      "step": 3,
+      "action": "验证回滚结果",
+      "command": "kubectl get pods -l app=stock-analysis-api",
+      "estimated_time": "2分钟"
+    },
+    {
+      "step": 4,
+      "action": "恢复数据库",
+      "command": "pg_restore -d stock_analysis backup_file.sql",
+      "estimated_time": "10分钟"
+    },
+    {
+      "step": 5,
+      "action": "通知相关人员",
+      "command": "发送回滚通知邮件",
+      "estimated_time": "1分钟"
+    }
+  ],
+  "validation_checks": [
+    "健康检查端点返回200",
+    "关键API响应正常",
+    "数据库连接正常",
+    "缓存服务正常",
+    "监控指标恢复正常"
+  ]
+}

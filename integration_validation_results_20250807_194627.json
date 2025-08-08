@@ -1,0 +1,151 @@
+{
+  "start_time": "2025-08-07 19:46:27.023204",
+  "tests": [
+    {
+      "name": "错误处理器初始化",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.023261",
+      "details": ""
+    },
+    {
+      "name": "降级策略初始化",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.023308",
+      "details": ""
+    },
+    {
+      "name": "故障转移管理器初始化",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.023325",
+      "details": ""
+    },
+    {
+      "name": "数据源管理器初始化",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.024262",
+      "details": ""
+    },
+    {
+      "name": "缓存管理器初始化",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.024272",
+      "details": ""
+    },
+    {
+      "name": "错误处理器-错误记录",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.024368",
+      "details": ""
+    },
+    {
+      "name": "错误处理器-统计功能",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.024378",
+      "details": ""
+    },
+    {
+      "name": "缓存管理器-读写功能",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.026812",
+      "details": ""
+    },
+    {
+      "name": "缓存管理器测试",
+      "passed": false,
+      "timestamp": "2025-08-07T19:46:27.026819",
+      "details": "'CacheManager' object has no attribute 'get_cache_statistics'"
+    },
+    {
+      "name": "数据源管理器-数据获取",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.026869",
+      "details": ""
+    },
+    {
+      "name": "数据源管理器-健康检查",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.026872",
+      "details": ""
+    },
+    {
+      "name": "数据流-完整流程",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.034613",
+      "details": "响应时间: 0.008s"
+    },
+    {
+      "name": "错误处理-network",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.034706",
+      "details": ""
+    },
+    {
+      "name": "错误处理-data_format",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.034767",
+      "details": ""
+    },
+    {
+      "name": "错误处理-network",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.034812",
+      "details": ""
+    },
+    {
+      "name": "错误处理-统计更新",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.135105",
+      "details": ""
+    },
+    {
+      "name": "故障转移-资源切换",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.235439",
+      "details": ""
+    },
+    {
+      "name": "故障转移-统计记录",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.235470",
+      "details": ""
+    },
+    {
+      "name": "性能-并发处理",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.335822",
+      "details": "总时间: 0.100s, 平均响应: 0.100s"
+    },
+    {
+      "name": "性能-内存使用",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.341095",
+      "details": "内存使用: 151.9MB"
+    },
+    {
+      "name": "场景-数据源故障转移",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.341108",
+      "details": "模拟测试通过"
+    },
+    {
+      "name": "场景-系统降级",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.341387",
+      "details": "模拟测试通过"
+    },
+    {
+      "name": "场景-缓存失效",
+      "passed": true,
+      "timestamp": "2025-08-07T19:46:27.341455",
+      "details": "模拟测试通过"
+    }
+  ],
+  "summary": {
+    "total": 23,
+    "passed": 22,
+    "failed": 1,
+    "skipped": 0
+  },
+  "end_time": "2025-08-07 19:46:27.341468",
+  "duration": 0.318264
+}

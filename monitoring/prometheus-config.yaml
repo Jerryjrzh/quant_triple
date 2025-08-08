@@ -1,0 +1,368 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: stock-analysis
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: 'stock-analysis-prod'
+        environment: 'production'
+
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+
+    scrape_configs:
+      # Kubernetes API Server
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+          - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: default;kubernetes;https
+
+      # Kubernetes Nodes
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+
+      # Kubernetes Pods
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+      # Stock Analysis API
+      - job_name: 'stock-analysis-api'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - stock-analysis
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: stock-analysis-api
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: http
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+
+      # PostgreSQL
+      - job_name: 'postgresql'
+        static_configs:
+          - targets: ['postgresql-exporter:9187']
+        scrape_interval: 30s
+
+      # Redis
+      - job_name: 'redis'
+        static_configs:
+          - targets: ['redis-exporter:9121']
+        scrape_interval: 30s
+
+      # Node Exporter
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_endpoints_name]
+            regex: 'node-exporter'
+            action: keep
+
+      # cAdvisor
+      - job_name: 'kubernetes-cadvisor'
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+          path_prefix: /
+          scheme: http
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: stock-analysis
+data:
+  stock-analysis-rules.yml: |
+    groups:
+      - name: stock-analysis.rules
+        interval: 30s
+        rules:
+          # API Performance Rules
+          - alert: HighAPIErrorRate
+            expr: |
+              (
+                rate(http_requests_total{job="stock-analysis-api",status=~"5.."}[5m]) /
+                rate(http_requests_total{job="stock-analysis-api"}[5m])
+              ) * 100 > 5
+            for: 2m
+            labels:
+              severity: critical
+              service: api
+            annotations:
+              summary: "High API error rate detected"
+              description: "API error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+          - alert: HighAPIResponseTime
+            expr: |
+              histogram_quantile(0.95, 
+                rate(http_request_duration_seconds_bucket{job="stock-analysis-api"}[5m])
+              ) > 2
+            for: 5m
+            labels:
+              severity: warning
+              service: api
+            annotations:
+              summary: "High API response time"
+              description: "95th percentile response time is {{ $value }}s"
+
+          - alert: APIHighRequestRate
+            expr: |
+              rate(http_requests_total{job="stock-analysis-api"}[5m]) > 1000
+            for: 5m
+            labels:
+              severity: warning
+              service: api
+            annotations:
+              summary: "High API request rate"
+              description: "API is receiving {{ $value }} requests per second"
+
+          # Database Rules
+          - alert: PostgreSQLDown
+            expr: pg_up == 0
+            for: 1m
+            labels:
+              severity: critical
+              service: database
+            annotations:
+              summary: "PostgreSQL is down"
+              description: "PostgreSQL database is not responding"
+
+          - alert: PostgreSQLHighConnections
+            expr: |
+              (pg_stat_activity_count / pg_settings_max_connections) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+              service: database
+            annotations:
+              summary: "PostgreSQL high connections"
+              description: "PostgreSQL is using {{ $value | humanizePercentage }} of max connections"
+
+          - alert: PostgreSQLSlowQueries
+            expr: |
+              rate(pg_stat_statements_mean_time_seconds[5m]) > 1
+            for: 5m
+            labels:
+              severity: warning
+              service: database
+            annotations:
+              summary: "PostgreSQL slow queries detected"
+              description: "Average query time is {{ $value }}s"
+
+          # Redis Rules
+          - alert: RedisDown
+            expr: redis_up == 0
+            for: 1m
+            labels:
+              severity: critical
+              service: cache
+            annotations:
+              summary: "Redis is down"
+              description: "Redis cache server is not responding"
+
+          - alert: RedisHighMemoryUsage
+            expr: |
+              (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 90
+            for: 5m
+            labels:
+              severity: critical
+              service: cache
+            annotations:
+              summary: "Redis high memory usage"
+              description: "Redis memory usage is {{ $value | humanizePercentage }}"
+
+          - alert: RedisLowHitRate
+            expr: |
+              (
+                rate(redis_keyspace_hits_total[5m]) /
+                (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m]))
+              ) * 100 < 80
+            for: 10m
+            labels:
+              severity: warning
+              service: cache
+            annotations:
+              summary: "Redis low hit rate"
+              description: "Redis hit rate is {{ $value | humanizePercentage }}"
+
+          # System Rules
+          - alert: HighCPUUsage
+            expr: |
+              (
+                100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+              ) > 85
+            for: 10m
+            labels:
+              severity: warning
+              service: system
+            annotations:
+              summary: "High CPU usage"
+              description: "CPU usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+          - alert: HighMemoryUsage
+            expr: |
+              (
+                (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+                node_memory_MemTotal_bytes
+              ) * 100 > 90
+            for: 5m
+            labels:
+              severity: critical
+              service: system
+            annotations:
+              summary: "High memory usage"
+              description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+          - alert: HighDiskUsage
+            expr: |
+              (
+                (node_filesystem_size_bytes - node_filesystem_avail_bytes) /
+                node_filesystem_size_bytes
+              ) * 100 > 85
+            for: 5m
+            labels:
+              severity: warning
+              service: system
+            annotations:
+              summary: "High disk usage"
+              description: "Disk usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+          # Kubernetes Rules
+          - alert: PodCrashLooping
+            expr: |
+              rate(kube_pod_container_status_restarts_total[15m]) > 0
+            for: 5m
+            labels:
+              severity: warning
+              service: kubernetes
+            annotations:
+              summary: "Pod is crash looping"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting frequently"
+
+          - alert: PodNotReady
+            expr: |
+              kube_pod_status_ready{condition="false"} == 1
+            for: 10m
+            labels:
+              severity: warning
+              service: kubernetes
+            annotations:
+              summary: "Pod not ready"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is not ready"
+
+          - alert: DeploymentReplicasMismatch
+            expr: |
+              kube_deployment_spec_replicas != kube_deployment_status_available_replicas
+            for: 10m
+            labels:
+              severity: warning
+              service: kubernetes
+            annotations:
+              summary: "Deployment replicas mismatch"
+              description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $labels.spec_replicas }} desired but {{ $labels.available_replicas }} available replicas"
+
+          # Business Logic Rules
+          - alert: LowDataQualityScore
+            expr: |
+              data_quality_score < 0.8
+            for: 15m
+            labels:
+              severity: warning
+              service: business
+            annotations:
+              summary: "Low data quality score"
+              description: "Data quality score is {{ $value }} which is below threshold"
+
+          - alert: HighCeleryQueueLength
+            expr: |
+              celery_queue_length > 1000
+            for: 5m
+            labels:
+              severity: warning
+              service: celery
+            annotations:
+              summary: "High Celery queue length"
+              description: "Celery queue has {{ $value }} pending tasks"
+
+          - alert: CeleryWorkerDown
+            expr: |
+              celery_workers_active == 0
+            for: 2m
+            labels:
+              severity: critical
+              service: celery
+            annotations:
+              summary: "No active Celery workers"
+              description: "All Celery workers are down"

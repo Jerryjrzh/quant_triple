@@ -17,7 +17,7 @@ from pathlib import Path
 from .prometheus_metrics import PrometheusMetricsCollector
 from .grafana_dashboards import GrafanaDashboardManager, GrafanaConfig
 from .jaeger_tracing import JaegerTracingManager, TracingConfig
-from .elk_logging import ELKLoggingManager, ELKConfig
+from .elk_logging import ELKLogger
 
 
 @dataclass
@@ -84,7 +84,7 @@ class MonitoringStack:
         self.prometheus_collector: Optional[PrometheusMetricsCollector] = None
         self.grafana_manager: Optional[GrafanaDashboardManager] = None
         self.jaeger_tracer: Optional[JaegerTracingManager] = None
-        self.elk_manager: Optional[ELKLoggingManager] = None
+        self.elk_manager: Optional[ELKLoggingSystem] = None
         
         # Health monitoring
         self._health_check_thread: Optional[threading.Thread] = None
@@ -180,18 +180,10 @@ class MonitoringStack:
     def _initialize_elk(self):
         """Initialize ELK logging"""
         try:
-            elk_config = ELKConfig(
-                service_name=self.config.service_name,
-                environment=self.config.environment,
+            self.elk_manager = ELKLoggingSystem(
                 elasticsearch_hosts=self.config.elasticsearch_hosts,
-                elasticsearch_index=self.config.elasticsearch_index,
-                logstash_host=self.config.logstash_host,
-                logstash_port=self.config.logstash_port,
-                kibana_url=self.config.kibana_url,
                 log_level=self.config.log_level
             )
-            
-            self.elk_manager = ELKLoggingManager(elk_config)
             
             self.logger.info("ELK logging initialized")
             

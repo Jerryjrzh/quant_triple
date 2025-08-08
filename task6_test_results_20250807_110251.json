@@ -1,0 +1,64 @@
+{
+  "test_start_time": "2025-08-07T11:02:46.560607",
+  "tests": {
+    "6.1_realtime_analysis": {
+      "success": true,
+      "performance_metrics": {
+        "total_duration": 0.001817464828491211,
+        "meets_sla": true
+      },
+      "data_quality_metrics": {
+        "overall_score": 0.95
+      },
+      "error_details": []
+    },
+    "6.2_dragon_tiger_monitoring": {
+      "success": true,
+      "monitoring_metrics": {
+        "processing_time": 0.0006082057952880859
+      },
+      "alert_metrics": {
+        "alerts_generated": 2
+      },
+      "error_details": []
+    },
+    "6.3_fund_flow_tracking": {
+      "success": true,
+      "tracking_metrics": {
+        "data_consistency": {
+          "consistency_score": 0.9
+        },
+        "processing_time": 0.0010688304901123047
+      },
+      "error_details": []
+    },
+    "6.4_performance_benchmark": {
+      "success": true,
+      "benchmark_results": {
+        "data_acquisition_time": 0.0015196800231933594,
+        "data_processing_time": 0.0006937980651855469,
+        "throughput": 1441341.5807560137
+      },
+      "error_details": []
+    },
+    "6.5_stress_load_testing": {
+      "success": true,
+      "load_test_results": {
+        "concurrent_users": 10,
+        "total_requests": 500,
+        "error_rate": 0.0,
+        "throughput": 100.0,
+        "test_duration": 5
+      },
+      "error_details": []
+    }
+  },
+  "summary": {
+    "total_tests": 5,
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "success_rate": 1.0,
+    "overall_success": true
+  },
+  "test_end_time": "2025-08-07T11:02:51.652179"
+}

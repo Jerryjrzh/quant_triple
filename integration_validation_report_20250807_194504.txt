@@ -1,0 +1,36 @@
+
+系统集成验证报告
+================
+
+验证时间: 2025-08-07 19:45:03 - 2025-08-07 19:45:04
+验证耗时: 0.31 秒
+
+测试摘要:
+- 总测试数: 21
+- 通过数: 17
+- 失败数: 4
+- 跳过数: 0
+- 成功率: 81.0%
+
+详细结果:
+- 错误处理器初始化: ✅ PASSED
+- 降级策略初始化: ✅ PASSED
+- 故障转移管理器初始化: ✅ PASSED
+- 数据源管理器初始化: ✅ PASSED
+- 缓存管理器初始化: ✅ PASSED
+- 错误处理器-错误记录: ✅ PASSED
+- 错误处理器-统计功能: ✅ PASSED
+- 缓存管理器测试: ❌ FAILED ('CacheManager' object has no attribute 'set')
+- 数据源管理器测试: ❌ FAILED (No module named 'stock_analysis_system.data.adapters')
+- 数据流验证: ❌ FAILED ('CacheManager' object has no attribute 'get')
+- 错误处理-network: ✅ PASSED
+- 错误处理-data_format: ✅ PASSED
+- 错误处理-network: ✅ PASSED
+- 错误处理-统计更新: ✅ PASSED
+- 故障转移-资源切换: ✅ PASSED
+- 故障转移-统计记录: ✅ PASSED
+- 性能-并发处理: ✅ PASSED (总时间: 0.100s, 平均响应: 0.100s)
+- 性能-内存使用: ✅ PASSED (内存使用: 151.4MB)
+- 场景-数据源故障转移: ✅ PASSED (模拟测试通过)
+- 场景-系统降级: ✅ PASSED (模拟测试通过)
+- 场景-缓存失效: ❌ FAILED ('CacheManager' object has no attribute 'delete')

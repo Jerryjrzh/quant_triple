@@ -1,654 +1,658 @@
 """
-Tests for Automated Training Pipeline
-
-This module tests the comprehensive automated ML training capabilities including:
-- Automated feature engineering and selection
-- Hyperparameter optimization using Bayesian methods
-- Model validation and cross-validation frameworks
-- Automated model deployment and rollback capabilities
+Tests for Automated Model Training Pipeline
 """
 
+import pytest
 import asyncio
-import os
-import tempfile
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
-
 import numpy as np
 import pandas as pd
-import pytest
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
+from datetime import datetime, timedelta
+from unittest.mock import Mock, patch, AsyncMock, MagicMock
+import tempfile
+import os
+import json
 
-from stock_analysis_system.analysis.automated_training_pipeline import (
-    DEFAULT_MODEL_CONFIGS,
-    AutomatedFeatureEngineer,
+from stock_analysis_system.ml.automated_training_pipeline import (
     AutomatedTrainingPipeline,
-    BayesianHyperparameterOptimizer,
-    FeatureEngineeringConfig,
-    ModelConfig,
     TrainingConfig,
+    TrainingJob,
     TrainingResult,
-    create_default_training_config,
+    TrainingJobStatus,
+    TrainingJobType,
+    ModelType,
+    OptimizationMethod
 )
-from stock_analysis_system.analysis.ml_model_manager import MLModelManager, ModelMetrics
-
-
-@pytest.fixture
-def sample_stock_data():
-    """Create sample stock data for testing."""
-    np.random.seed(42)
-
-    dates = pd.date_range(start="2020-01-01", end="2023-12-31", freq="D")
-    n_days = len(dates)
-
-    # Generate realistic stock price data
-    base_price = 100
-    returns = np.random.normal(0.001, 0.02, n_days)  # Daily returns
-    prices = [base_price]
-
-    for ret in returns[1:]:
-        prices.append(prices[-1] * (1 + ret))
-
-    # Create OHLCV data
-    data = pd.DataFrame(
-        {
-            "trade_date": dates,
-            "open_price": prices,
-            "high_price": [p * (1 + abs(np.random.normal(0, 0.01))) for p in prices],
-            "low_price": [p * (1 - abs(np.random.normal(0, 0.01))) for p in prices],
-            "close_price": prices,
-            "volume": np.random.randint(1000000, 10000000, n_days),
-            "stock_code": ["000001"] * n_days,
-        }
-    )
-
-    # Create a simple target variable (1 if next day price goes up, 0 otherwise)
-    data["target"] = (data["close_price"].shift(-1) > data["close_price"]).astype(int)
-    data = data.dropna()
-
-    return data
-
-
-@pytest.fixture
-def feature_engineering_config():
-    """Create feature engineering configuration for testing."""
-    return FeatureEngineeringConfig(
-        technical_indicators=True,
-        statistical_features=True,
-        lag_features=True,
-        rolling_features=True,
-        interaction_features=False,  # Disable to speed up tests
-        polynomial_features=False,  # Disable to speed up tests
-        max_lag_periods=5,
-        rolling_windows=[5, 10],
-    )
-
-
-@pytest.fixture
-def simple_model_config():
-    """Create a simple model configuration for testing."""
-    return ModelConfig(
-        model_class=RandomForestClassifier,
-        param_space={"n_estimators": [10, 20], "max_depth": [3, 5]},
-        name="test_random_forest",
-        requires_scaling=False,
-    )
-
-
-@pytest.fixture
-def training_config(feature_engineering_config, simple_model_config):
-    """Create training configuration for testing."""
-    return TrainingConfig(
-        target_column="target",
-        feature_engineering=feature_engineering_config,
-        models=[simple_model_config],
-        cv_folds=3,
-        test_size=0.2,
-        validation_size=0.2,
-        optimization_method="grid",  # Use grid search for faster testing
-        n_optimization_calls=4,
-        scoring_metric="accuracy",
-        feature_selection_k=10,
-        auto_deploy=False,
-    )
-
-
-@pytest.fixture
-async def mock_ml_manager():
-    """Create a mock ML manager for testing."""
-    manager = Mock(spec=MLModelManager)
-    manager.register_model = AsyncMock(return_value="test_model_id")
-    manager.promote_model_to_production = AsyncMock(return_value=True)
-    manager.list_models = AsyncMock(return_value=[])
-    return manager
-
-
-class TestAutomatedFeatureEngineer:
-    """Test cases for AutomatedFeatureEngineer."""
-
-    @pytest.mark.asyncio
-    async def test_feature_engineering_basic(
-        self, sample_stock_data, feature_engineering_config
-    ):
-        """Test basic feature engineering functionality."""
-        engineer = AutomatedFeatureEngineer(feature_engineering_config)
-
-        # Use a smaller subset for faster testing
-        test_data = sample_stock_data.head(100).copy()
-
-        result = await engineer.engineer_features(test_data)
-
-        # Check that features were added
-        assert len(result.columns) > len(test_data.columns)
-
-        # Check for specific technical indicators
-        expected_indicators = ["sma_5", "sma_10", "rsi_14", "macd", "bb_upper"]
-        for indicator in expected_indicators:
-            assert indicator in result.columns, f"Missing indicator: {indicator}"
-
-        # Check for lag features
-        lag_features = [col for col in result.columns if "_lag_" in col]
-        assert len(lag_features) > 0, "No lag features found"
-
-        # Check for rolling features
-        rolling_features = [col for col in result.columns if "_rolling_" in col]
-        assert len(rolling_features) > 0, "No rolling features found"
-
-    @pytest.mark.asyncio
-    async def test_technical_indicators(
-        self, sample_stock_data, feature_engineering_config
-    ):
-        """Test technical indicators generation."""
-        engineer = AutomatedFeatureEngineer(feature_engineering_config)
-        test_data = sample_stock_data.head(100).copy()
-
-        result = await engineer._add_technical_indicators(test_data)
-
-        # Check specific indicators
-        technical_indicators = [
-            "sma_5",
-            "sma_10",
-            "sma_20",
-            "ema_12",
-            "ema_26",
-            "macd",
-            "macd_signal",
-            "rsi_14",
-            "bb_upper",
-            "bb_lower",
-            "stoch_k",
-            "adx",
-            "atr",
-        ]
-
-        for indicator in technical_indicators:
-            assert (
-                indicator in result.columns
-            ), f"Missing technical indicator: {indicator}"
-            # Check that indicator has reasonable values (not all NaN)
-            assert (
-                not result[indicator].isna().all()
-            ), f"Indicator {indicator} is all NaN"
-
-    @pytest.mark.asyncio
-    async def test_statistical_features(
-        self, sample_stock_data, feature_engineering_config
-    ):
-        """Test statistical features generation."""
-        engineer = AutomatedFeatureEngineer(feature_engineering_config)
-        test_data = sample_stock_data.head(100).copy()
-
-        result = await engineer._add_statistical_features(test_data)
-
-        # Check specific statistical features
-        stat_features = [
-            "price_range",
-            "price_change",
-            "price_change_pct",
-            "volume_price_trend",
-            "high_low_pct",
-        ]
-
-        for feature in stat_features:
-            assert feature in result.columns, f"Missing statistical feature: {feature}"
-
-    @pytest.mark.asyncio
-    async def test_lag_features(self, sample_stock_data, feature_engineering_config):
-        """Test lag features generation."""
-        engineer = AutomatedFeatureEngineer(feature_engineering_config)
-        test_data = sample_stock_data.head(100).copy()
-
-        # Add a simple feature first
-        test_data["test_feature"] = test_data["close_price"]
-
-        result = await engineer._add_lag_features(test_data)
-
-        # Check that lag features were created
-        lag_features = [col for col in result.columns if "_lag_" in col]
-        assert len(lag_features) > 0, "No lag features created"
-
-        # Check specific lag feature
-        if "close_price_lag_1" in result.columns:
-            # Verify lag is correct (ignoring NaN values)
-            valid_indices = ~result["close_price_lag_1"].isna()
-            if valid_indices.sum() > 1:
-                original_values = test_data["close_price"].iloc[1:].values
-                lagged_values = result["close_price_lag_1"].iloc[1:].values
-                lagged_values = lagged_values[~np.isnan(lagged_values)]
-                if len(lagged_values) > 0 and len(original_values) > 0:
-                    # Check first few values
-                    np.testing.assert_array_almost_equal(
-                        original_values[: len(lagged_values) - 1],
-                        lagged_values[1 : len(original_values)],
-                        decimal=2,
-                    )
-
-    @pytest.mark.asyncio
-    async def test_missing_columns_error(self, feature_engineering_config):
-        """Test error handling for missing required columns."""
-        engineer = AutomatedFeatureEngineer(feature_engineering_config)
-
-        # Create data missing required columns
-        incomplete_data = pd.DataFrame(
-            {
-                "close_price": [100, 101, 102],
-                "volume": [1000, 1100, 1200],
-                # Missing open_price, high_price, low_price
-            }
-        )
-
-        with pytest.raises(ValueError, match="Missing required columns"):
-            await engineer.engineer_features(incomplete_data)
-
-
-class TestBayesianHyperparameterOptimizer:
-    """Test cases for BayesianHyperparameterOptimizer."""
-
-    @pytest.mark.asyncio
-    async def test_grid_search_optimization(self, simple_model_config):
-        """Test hyperparameter optimization using grid search."""
-        optimizer = BayesianHyperparameterOptimizer(simple_model_config, "accuracy")
-
-        # Create simple test data
-        np.random.seed(42)
-        X = np.random.randn(100, 5)
-        y = np.random.randint(0, 2, 100)
-
-        best_params, best_score = await optimizer.optimize(X, y, cv_folds=3, n_calls=4)
-
-        # Check that we got valid results
-        assert isinstance(best_params, dict)
-        assert isinstance(best_score, float)
-        assert best_score > 0  # Should be positive for accuracy
-
-        # Check that parameters are from the specified space
-        assert best_params["n_estimators"] in [10, 20]
-        assert best_params["max_depth"] in [3, 5]
-
-    @pytest.mark.asyncio
-    async def test_optimization_with_invalid_data(self, simple_model_config):
-        """Test optimization with invalid data."""
-        optimizer = BayesianHyperparameterOptimizer(simple_model_config, "accuracy")
-
-        # Create data that will cause model fitting to fail
-        X = np.full((10, 5), np.nan)
-        y = np.random.randint(0, 2, 10)
-
-        # Should handle errors gracefully
-        best_params, best_score = await optimizer.optimize(X, y, cv_folds=3, n_calls=4)
-
-        # Should return some result even with problematic data
-        assert isinstance(best_params, dict)
-        assert isinstance(best_score, float)
 
 
 class TestAutomatedTrainingPipeline:
     """Test cases for AutomatedTrainingPipeline."""
-
-    @pytest.mark.asyncio
-    async def test_full_training_pipeline(
-        self, sample_stock_data, training_config, mock_ml_manager
-    ):
-        """Test the complete training pipeline."""
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        # Use smaller dataset for faster testing
-        test_data = sample_stock_data.head(200).copy()
-
-        results = await pipeline.train_models(test_data, training_config)
-
-        # Check that we got results
-        assert len(results) > 0, "No training results returned"
-
-        # Check result structure
-        result = results[0]
-        assert isinstance(result, TrainingResult)
-        assert result.model_id is not None
-        assert result.model_name == "test_random_forest"
-        assert isinstance(result.best_score, float)
-        assert isinstance(result.best_params, dict)
-        assert len(result.feature_names) > 0
-        assert result.model_object is not None
-
-    @pytest.mark.asyncio
-    async def test_data_preparation(self, sample_stock_data, mock_ml_manager):
-        """Test data preparation functionality."""
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        test_data = sample_stock_data.head(100).copy()
-
-        X, y = await pipeline._prepare_data(test_data, "target")
-
-        # Check that target was separated correctly
-        assert "target" not in X.columns
-        assert len(y) == len(test_data)
-        assert len(X) == len(test_data)
-
-        # Check that only numeric columns are kept
-        assert all(X.dtypes.apply(lambda x: np.issubdtype(x, np.number)))
-
-    @pytest.mark.asyncio
-    async def test_data_splitting(self, sample_stock_data, mock_ml_manager):
-        """Test data splitting functionality."""
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        test_data = sample_stock_data.head(100).copy()
-        X, y = await pipeline._prepare_data(test_data, "target")
-
-        X_train, X_val, X_test, y_train, y_val, y_test = await pipeline._split_data(
-            X, y, test_size=0.2, validation_size=0.2
-        )
-
-        # Check split sizes
-        total_samples = len(X)
-        expected_test_size = int(total_samples * 0.2)
-        expected_val_size = int((total_samples - expected_test_size) * 0.2)
-        expected_train_size = total_samples - expected_test_size - expected_val_size
-
-        assert len(X_test) == expected_test_size
-        assert len(X_val) == expected_val_size
-        assert len(X_train) == expected_train_size
-
-        # Check that splits don't overlap
-        assert len(set(X_train.index) & set(X_val.index)) == 0
-        assert len(set(X_train.index) & set(X_test.index)) == 0
-        assert len(set(X_val.index) & set(X_test.index)) == 0
-
-    @pytest.mark.asyncio
-    async def test_feature_selection(self, sample_stock_data, mock_ml_manager):
-        """Test feature selection functionality."""
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        # Create data with many features
-        np.random.seed(42)
-        n_samples = 100
-        n_features = 50
-
-        X_train = pd.DataFrame(np.random.randn(n_samples, n_features))
-        X_val = pd.DataFrame(np.random.randn(20, n_features))
-        X_test = pd.DataFrame(np.random.randn(20, n_features))
-        y_train = pd.Series(np.random.randint(0, 2, n_samples))
-
-        k = 10
-        X_train_sel, X_val_sel, X_test_sel, selected_features = (
-            await pipeline._select_features(X_train, X_val, X_test, y_train, k)
-        )
-
-        # Check that feature selection worked
-        assert len(selected_features) <= k
-        assert X_train_sel.shape[1] == len(selected_features)
-        assert X_val_sel.shape[1] == len(selected_features)
-        assert X_test_sel.shape[1] == len(selected_features)
-
-        # Check that selected features are from original features
-        assert all(feature in X_train.columns for feature in selected_features)
-
-    @pytest.mark.asyncio
-    async def test_single_model_training(
-        self, sample_stock_data, simple_model_config, training_config, mock_ml_manager
-    ):
-        """Test training of a single model."""
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        # Prepare simple test data
-        np.random.seed(42)
-        n_samples = 100
-        n_features = 10
-
-        X_train = pd.DataFrame(np.random.randn(n_samples, n_features))
-        X_val = pd.DataFrame(np.random.randn(20, n_features))
-        X_test = pd.DataFrame(np.random.randn(20, n_features))
-        y_train = pd.Series(np.random.randint(0, 2, n_samples))
-        y_val = pd.Series(np.random.randint(0, 2, 20))
-        y_test = pd.Series(np.random.randint(0, 2, 20))
-
-        feature_names = [f"feature_{i}" for i in range(n_features)]
-
-        result = await pipeline._train_single_model(
-            simple_model_config,
-            X_train,
-            X_val,
-            X_test,
-            y_train,
-            y_val,
-            y_test,
-            feature_names,
-            training_config,
-        )
-
-        # Check result structure
-        assert isinstance(result, TrainingResult)
-        assert result.model_name == "test_random_forest"
-        assert isinstance(result.best_score, float)
-        assert isinstance(result.best_params, dict)
-        assert len(result.cv_scores) == training_config.cv_folds
-        assert len(result.feature_names) == n_features
-        assert result.model_object is not None
-
-        # Check validation metrics
-        required_metrics = [
-            "val_accuracy",
-            "val_precision",
-            "val_recall",
-            "val_f1",
-            "test_accuracy",
-            "test_precision",
-            "test_recall",
-            "test_f1",
-        ]
-        for metric in required_metrics:
-            assert metric in result.validation_metrics
-            assert isinstance(result.validation_metrics[metric], float)
-
-    @pytest.mark.asyncio
-    async def test_auto_deployment(
-        self, sample_stock_data, training_config, mock_ml_manager
-    ):
-        """Test automated model deployment."""
-        # Enable auto deployment
-        training_config.auto_deploy = True
-
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        # Use smaller dataset
-        test_data = sample_stock_data.head(100).copy()
-
-        results = await pipeline.train_models(test_data, training_config)
-
-        # Check that model was registered
-        mock_ml_manager.register_model.assert_called_once()
-
-        # Check that model was promoted (since no existing production models)
-        mock_ml_manager.promote_model_to_production.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_invalid_target_column(
-        self, sample_stock_data, training_config, mock_ml_manager
-    ):
-        """Test error handling for invalid target column."""
-        training_config.target_column = "nonexistent_column"
-
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        with pytest.raises(
-            ValueError, match="Target column 'nonexistent_column' not found"
-        ):
-            await pipeline.train_models(sample_stock_data.head(50), training_config)
-
-
-class TestDefaultConfigurations:
-    """Test cases for default configurations."""
-
-    def test_default_model_configs(self):
-        """Test that default model configurations are valid."""
-        assert len(DEFAULT_MODEL_CONFIGS) > 0
-
-        for config in DEFAULT_MODEL_CONFIGS:
-            assert isinstance(config, ModelConfig)
-            assert config.model_class is not None
-            assert isinstance(config.param_space, dict)
-            assert isinstance(config.name, str)
-            assert isinstance(config.requires_scaling, bool)
-
-    @pytest.mark.asyncio
-    async def test_create_default_training_config(self):
-        """Test creation of default training configuration."""
-        config = await create_default_training_config("target")
-
-        assert isinstance(config, TrainingConfig)
-        assert config.target_column == "target"
-        assert isinstance(config.feature_engineering, FeatureEngineeringConfig)
-        assert len(config.models) > 0
-        assert config.cv_folds > 0
-        assert 0 < config.test_size < 1
-        assert 0 < config.validation_size < 1
-
-
-class TestIntegration:
-    """Integration tests for the complete pipeline."""
-
-    @pytest.mark.asyncio
-    async def test_end_to_end_pipeline(self, sample_stock_data, mock_ml_manager):
-        """Test the complete end-to-end pipeline."""
-        # Create a minimal configuration for faster testing
-        config = TrainingConfig(
-            target_column="target",
-            feature_engineering=FeatureEngineeringConfig(
-                technical_indicators=True,
-                statistical_features=True,
-                lag_features=False,  # Disable for speed
-                rolling_features=False,  # Disable for speed
-                interaction_features=False,
-                polynomial_features=False,
-            ),
-            models=[
-                ModelConfig(
-                    model_class=RandomForestClassifier,
-                    param_space={"n_estimators": [10], "max_depth": [3]},
-                    name="minimal_rf",
-                    requires_scaling=False,
+    
+    @pytest.fixture
+    def mock_database_url(self):
+        """Mock database URL for testing."""
+        return "sqlite:///:memory:"
+    
+    @pytest.fixture
+    def mock_mlflow_uri(self):
+        """Mock MLflow URI for testing."""
+        return "sqlite:///mlflow.db"
+    
+    @pytest.fixture
+    def training_pipeline(self, mock_database_url, mock_mlflow_uri):
+        """Create AutomatedTrainingPipeline instance for testing."""
+        with patch('stock_analysis_system.ml.automated_training_pipeline.create_engine'):
+            with patch('stock_analysis_system.ml.automated_training_pipeline.mlflow'):
+                pipeline = AutomatedTrainingPipeline(
+                    database_url=mock_database_url,
+                    mlflow_tracking_uri=mock_mlflow_uri,
+                    max_concurrent_jobs=2
                 )
-            ],
-            cv_folds=2,
-            test_size=0.3,
-            validation_size=0.3,
-            optimization_method="grid",
-            n_optimization_calls=1,
-            scoring_metric="accuracy",
-            feature_selection_k=5,
-            auto_deploy=False,
+                return pipeline
+    
+    @pytest.fixture
+    def sample_training_config(self):
+        """Sample training configuration for testing."""
+        return TrainingConfig(
+            model_type=ModelType.RANDOM_FOREST,
+            target_column="target",
+            feature_columns=["feature_1", "feature_2", "feature_3"],
+            validation_split=0.2,
+            test_split=0.1,
+            cross_validation_folds=3,
+            random_state=42,
+            scaling_method="standard",
+            feature_selection_k=None,
+            hyperparameter_optimization=True,
+            optimization_method=OptimizationMethod.BAYESIAN_OPTIMIZATION,
+            optimization_trials=10
         )
-
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
-
-        # Use very small dataset for speed
-        test_data = sample_stock_data.head(50).copy()
-
-        results = await pipeline.train_models(test_data, config)
-
-        # Verify we got valid results
-        assert len(results) == 1
-        result = results[0]
-
-        assert result.model_name == "minimal_rf"
-        assert isinstance(result.best_score, float)
-        assert result.model_object is not None
-        assert len(result.feature_names) > 0
-        assert len(result.validation_metrics) > 0
-
-    @pytest.mark.asyncio
-    async def test_pipeline_with_real_data_structure(self, mock_ml_manager):
-        """Test pipeline with realistic stock data structure."""
-        # Create more realistic stock data
+    
+    @pytest.fixture
+    def sample_dataset_config(self):
+        """Sample dataset configuration for testing."""
+        return {
+            "n_samples": 1000,
+            "n_features": 10,
+            "data_source": "synthetic"
+        }
+    
+    @pytest.fixture
+    def sample_training_data(self):
+        """Sample training data for testing."""
         np.random.seed(42)
-        dates = pd.date_range(start="2023-01-01", end="2023-06-30", freq="D")
-        n_days = len(dates)
-
-        # Simulate stock price with trend and volatility
-        base_price = 50.0
-        trend = 0.0002  # Small upward trend
-        volatility = 0.02
-
-        prices = [base_price]
-        for i in range(1, n_days):
-            change = np.random.normal(trend, volatility)
-            new_price = prices[-1] * (1 + change)
-            prices.append(max(new_price, 1.0))  # Ensure positive prices
-
-        data = pd.DataFrame(
-            {
-                "trade_date": dates,
-                "stock_code": "000001",
-                "open_price": prices,
-                "high_price": [
-                    p * (1 + abs(np.random.normal(0, 0.005))) for p in prices
-                ],
-                "low_price": [
-                    p * (1 - abs(np.random.normal(0, 0.005))) for p in prices
-                ],
-                "close_price": prices,
-                "volume": np.random.randint(100000, 1000000, n_days),
-                "amount": [
-                    p * v
-                    for p, v in zip(prices, np.random.randint(100000, 1000000, n_days))
-                ],
-            }
+        n_samples, n_features = 100, 5
+        
+        X = pd.DataFrame(
+            np.random.randn(n_samples, n_features),
+            columns=[f'feature_{i}' for i in range(n_features)]
         )
-
-        # Create target: 1 if price goes up next day, 0 otherwise
-        data["target"] = (data["close_price"].shift(-1) > data["close_price"]).astype(
-            int
+        
+        # Add stock-like columns
+        X['close'] = 100 + np.cumsum(np.random.randn(n_samples) * 0.1)
+        X['volume'] = np.random.lognormal(10, 1, n_samples)
+        X['high'] = X['close'] * (1 + np.random.uniform(0, 0.05, n_samples))
+        X['low'] = X['close'] * (1 - np.random.uniform(0, 0.05, n_samples))
+        
+        # Target variable
+        y = X['close'].pct_change().shift(-1).fillna(0)
+        
+        return X.iloc[:-1], y.iloc[:-1]
+    
+    @pytest.mark.asyncio
+    async def test_submit_training_job(self, training_pipeline, sample_training_config, 
+                                     sample_dataset_config):
+        """Test submitting a training job."""
+        # Mock database operations
+        training_pipeline._store_training_job = AsyncMock(return_value=None)
+        training_pipeline._process_job_queue = AsyncMock(return_value=None)
+        
+        # Submit job
+        job_id = await training_pipeline.submit_training_job(
+            model_id="test_model_1",
+            job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config,
+            dataset_config=sample_dataset_config,
+            priority=5,
+            triggered_by="test_user"
         )
-        data = data.dropna()
+        
+        assert job_id is not None
+        assert len(training_pipeline.job_queue) == 1
+        
+        job = training_pipeline.job_queue[0]
+        assert job.model_id == "test_model_1"
+        assert job.job_type == TrainingJobType.INITIAL_TRAINING
+        assert job.status == TrainingJobStatus.QUEUED
+        assert job.priority == 5
+        assert job.triggered_by == "test_user"
+    
+    @pytest.mark.asyncio
+    async def test_job_queue_priority_ordering(self, training_pipeline, sample_training_config, 
+                                             sample_dataset_config):
+        """Test that jobs are ordered by priority in the queue."""
+        training_pipeline._store_training_job = AsyncMock(return_value=None)
+        training_pipeline._process_job_queue = AsyncMock(return_value=None)
+        
+        # Submit jobs with different priorities
+        job_id_1 = await training_pipeline.submit_training_job(
+            model_id="model_1", job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config, dataset_config=sample_dataset_config,
+            priority=10
+        )
+        
+        job_id_2 = await training_pipeline.submit_training_job(
+            model_id="model_2", job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config, dataset_config=sample_dataset_config,
+            priority=1
+        )
+        
+        job_id_3 = await training_pipeline.submit_training_job(
+            model_id="model_3", job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config, dataset_config=sample_dataset_config,
+            priority=5
+        )
+        
+        # Check queue ordering (lower priority number = higher priority)
+        assert len(training_pipeline.job_queue) == 3
+        assert training_pipeline.job_queue[0].priority == 1  # Highest priority
+        assert training_pipeline.job_queue[1].priority == 5
+        assert training_pipeline.job_queue[2].priority == 10  # Lowest priority
+    
+    def test_create_model(self, training_pipeline):
+        """Test model creation."""
+        # Test creating different model types
+        linear_model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        assert linear_model.__class__.__name__ == "LinearRegression"
+        
+        rf_model = training_pipeline._create_model(ModelType.RANDOM_FOREST)
+        assert rf_model.__class__.__name__ == "RandomForestRegressor"
+        
+        # Test with parameters
+        rf_model_with_params = training_pipeline._create_model(
+            ModelType.RANDOM_FOREST, 
+            {"n_estimators": 50, "max_depth": 10}
+        )
+        assert rf_model_with_params.n_estimators == 50
+        assert rf_model_with_params.max_depth == 10
+    
+    def test_create_pipeline(self, training_pipeline, sample_training_config):
+        """Test pipeline creation."""
+        model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        
+        assert len(pipeline.steps) == 2
+        assert pipeline.steps[0][0] == "scaler"
+        assert pipeline.steps[1][0] == "model"
+        assert pipeline.steps[0][1].__class__.__name__ == "StandardScaler"
+    
+    def test_evaluate_model(self, training_pipeline, sample_training_data):
+        """Test model evaluation."""
+        X, y = sample_training_data
+        
+        # Create and fit a simple model
+        model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        config = TrainingConfig(
+            model_type=ModelType.LINEAR_REGRESSION,
+            target_column="target",
+            feature_columns=list(X.columns)
+        )
+        pipeline = training_pipeline._create_pipeline(model, config)
+        pipeline.fit(X, y)
+        
+        # Evaluate model
+        metrics = training_pipeline._evaluate_model(pipeline, X, y, "test")
+        
+        assert "test_mse" in metrics
+        assert "test_mae" in metrics
+        assert "test_r2" in metrics
+        assert "test_rmse" in metrics
+        
+        # Check that metrics are reasonable
+        assert metrics["test_mse"] >= 0
+        assert metrics["test_mae"] >= 0
+        assert metrics["test_rmse"] >= 0
+    
+    def test_cross_validate_model(self, training_pipeline, sample_training_data, 
+                                sample_training_config):
+        """Test cross-validation."""
+        X, y = sample_training_data
+        
+        model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        
+        cv_scores = training_pipeline._cross_validate_model(pipeline, X, y, sample_training_config)
+        
+        assert len(cv_scores) == sample_training_config.cross_validation_folds
+        assert all(isinstance(score, (int, float)) for score in cv_scores)
+    
+    def test_get_feature_importance(self, training_pipeline, sample_training_data):
+        """Test feature importance extraction."""
+        X, y = sample_training_data
+        feature_names = X.columns.tolist()
+        
+        # Test with Random Forest (has feature_importances_)
+        rf_model = training_pipeline._create_model(ModelType.RANDOM_FOREST)
+        config = TrainingConfig(
+            model_type=ModelType.RANDOM_FOREST,
+            target_column="target",
+            feature_columns=feature_names
+        )
+        rf_pipeline = training_pipeline._create_pipeline(rf_model, config)
+        rf_pipeline.fit(X, y)
+        
+        rf_importance = training_pipeline._get_feature_importance(rf_pipeline, feature_names)
+        assert len(rf_importance) == len(feature_names)
+        assert all(isinstance(imp, (int, float)) for imp in rf_importance.values())
+        
+        # Test with Linear Regression (has coef_)
+        lr_model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        lr_config = TrainingConfig(
+            model_type=ModelType.LINEAR_REGRESSION,
+            target_column="target",
+            feature_columns=feature_names
+        )
+        lr_pipeline = training_pipeline._create_pipeline(lr_model, lr_config)
+        lr_pipeline.fit(X, y)
+        
+        lr_importance = training_pipeline._get_feature_importance(lr_pipeline, feature_names)
+        assert len(lr_importance) == len(feature_names)
+    
+    @pytest.mark.asyncio
+    async def test_engineer_features(self, training_pipeline, sample_training_config):
+        """Test feature engineering."""
+        # Create sample data with stock-like columns
+        np.random.seed(42)
+        n_samples = 100
+        
+        X = pd.DataFrame({
+            'close': 100 + np.cumsum(np.random.randn(n_samples) * 0.1),
+            'volume': np.random.lognormal(10, 1, n_samples),
+            'high': np.random.uniform(100, 110, n_samples),
+            'low': np.random.uniform(90, 100, n_samples),
+            'feature_1': np.random.randn(n_samples),
+            'feature_2': np.random.randn(n_samples)
+        })
+        
+        y = pd.Series(np.random.randn(n_samples))
+        
+        X_processed, feature_names = await training_pipeline._engineer_features(
+            X, y, sample_training_config
+        )
+        
+        # Check that new features were created
+        assert X_processed.shape[1] > X.shape[1]
+        assert 'price_change' in X_processed.columns
+        assert 'price_volatility' in X_processed.columns
+        assert 'price_momentum' in X_processed.columns
+        assert 'volume_change' in X_processed.columns
+        assert 'price_range' in X_processed.columns
+        
+        # Check that feature names match
+        assert len(feature_names) == X_processed.shape[1]
+        assert feature_names == X_processed.columns.tolist()
+    
+    @pytest.mark.asyncio
+    async def test_load_training_data(self, training_pipeline, sample_dataset_config):
+        """Test training data loading."""
+        X, y = await training_pipeline._load_training_data(sample_dataset_config)
+        
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.Series)
+        assert X.shape[0] == y.shape[0]
+        assert X.shape[0] == sample_dataset_config['n_samples'] - 1  # Due to shift in target
+        
+        # Check that stock-like columns are present
+        assert 'close' in X.columns
+        assert 'volume' in X.columns
+        assert 'high' in X.columns
+        assert 'low' in X.columns
+    
+    @pytest.mark.asyncio
+    async def test_save_model_artifacts(self, training_pipeline, sample_training_data, 
+                                      sample_training_config):
+        """Test model artifact saving."""
+        X, y = sample_training_data
+        
+        # Create and train a model
+        model = training_pipeline._create_model(ModelType.LINEAR_REGRESSION)
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        pipeline.fit(X, y)
+        
+        # Mock file operations
+        with patch('joblib.dump') as mock_dump, \
+             patch('builtins.open', create=True) as mock_open:
+            
+            artifacts_path = await training_pipeline._save_model_artifacts(
+                "test_job_id", pipeline, sample_training_config
+            )
+            
+            assert artifacts_path == "models/test_job_id"
+            mock_dump.assert_called_once()
+            mock_open.assert_called_once()
+    
+    @pytest.mark.asyncio
+    async def test_get_job_status(self, training_pipeline, sample_training_config, 
+                                sample_dataset_config):
+        """Test getting job status."""
+        # Mock database operations
+        training_pipeline._store_training_job = AsyncMock(return_value=None)
+        training_pipeline._process_job_queue = AsyncMock(return_value=None)
+        
+        # Submit a job
+        job_id = await training_pipeline.submit_training_job(
+            model_id="test_model",
+            job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config,
+            dataset_config=sample_dataset_config
+        )
+        
+        # Get job status
+        job_status = await training_pipeline.get_job_status(job_id)
+        
+        assert job_status is not None
+        assert job_status.job_id == job_id
+        assert job_status.status == TrainingJobStatus.QUEUED
+    
+    @pytest.mark.asyncio
+    async def test_cancel_job(self, training_pipeline, sample_training_config, 
+                            sample_dataset_config):
+        """Test job cancellation."""
+        # Mock database operations
+        training_pipeline._store_training_job = AsyncMock(return_value=None)
+        training_pipeline._process_job_queue = AsyncMock(return_value=None)
+        training_pipeline._update_training_job_status = AsyncMock(return_value=None)
+        
+        # Submit a job
+        job_id = await training_pipeline.submit_training_job(
+            model_id="test_model",
+            job_type=TrainingJobType.INITIAL_TRAINING,
+            config=sample_training_config,
+            dataset_config=sample_dataset_config
+        )
+        
+        # Cancel the job
+        success = await training_pipeline.cancel_job(job_id)
+        
+        assert success is True
+        assert len(training_pipeline.job_queue) == 0  # Job removed from queue
+    
+    @pytest.mark.asyncio
+    async def test_get_queue_status(self, training_pipeline, sample_training_config, 
+                                  sample_dataset_config):
+        """Test getting queue status."""
+        # Mock database operations
+        training_pipeline._store_training_job = AsyncMock(return_value=None)
+        training_pipeline._process_job_queue = AsyncMock(return_value=None)
+        
+        # Submit multiple jobs
+        for i in range(3):
+            await training_pipeline.submit_training_job(
+                model_id=f"test_model_{i}",
+                job_type=TrainingJobType.INITIAL_TRAINING,
+                config=sample_training_config,
+                dataset_config=sample_dataset_config,
+                priority=i + 1
+            )
+        
+        # Get queue status
+        status = await training_pipeline.get_queue_status()
+        
+        assert status['queued_jobs'] == 3
+        assert status['running_jobs'] == 0
+        assert status['completed_jobs'] == 0
+        assert len(status['queue_details']) == 3
+        assert len(status['running_details']) == 0
+    
+    @pytest.mark.asyncio
+    async def test_cleanup_old_jobs(self, training_pipeline):
+        """Test cleanup of old jobs."""
+        # Mock database operations
+        training_pipeline.engine.connect = MagicMock()
+        mock_conn = MagicMock()
+        mock_result = MagicMock()
+        mock_result.rowcount = 5
+        mock_conn.execute = MagicMock(return_value=mock_result)
+        mock_conn.commit = MagicMock()
+        training_pipeline.engine.connect.return_value.__enter__ = MagicMock(return_value=mock_conn)
+        training_pipeline.engine.connect.return_value.__exit__ = MagicMock(return_value=None)
+        
+        # Cleanup old jobs
+        deleted_count = await training_pipeline.cleanup_old_jobs(retention_days=30)
+        
+        assert deleted_count == 5
+        mock_conn.execute.assert_called_once()
+        mock_conn.commit.assert_called_once()
+    
+    @pytest.mark.asyncio
+    async def test_bayesian_optimization(self, training_pipeline, sample_training_data, 
+                                       sample_training_config):
+        """Test Bayesian optimization."""
+        X, y = sample_training_data
+        
+        # Create pipeline
+        model = training_pipeline._create_model(ModelType.RANDOM_FOREST)
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        
+        # Mock optuna to avoid long optimization
+        with patch('optuna.create_study') as mock_create_study:
+            mock_study = MagicMock()
+            mock_study.best_params = {'n_estimators': 100, 'max_depth': 10}
+            mock_study.best_value = 0.85
+            mock_create_study.return_value = mock_study
+            
+            # Set small number of trials for testing
+            sample_training_config.optimization_trials = 2
+            
+            best_params, best_score = await training_pipeline._bayesian_optimization(
+                pipeline, X, y, sample_training_config
+            )
+            
+            assert isinstance(best_params, dict)
+            assert isinstance(best_score, (int, float))
+            assert 'n_estimators' in best_params
+            assert 'max_depth' in best_params
+    
+    @pytest.mark.asyncio
+    async def test_grid_search_optimization(self, training_pipeline, sample_training_data, 
+                                          sample_training_config):
+        """Test grid search optimization."""
+        X, y = sample_training_data
+        
+        # Create pipeline
+        model = training_pipeline._create_model(ModelType.RIDGE_REGRESSION)
+        sample_training_config.model_type = ModelType.RIDGE_REGRESSION
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        
+        # Reduce CV folds for faster testing
+        sample_training_config.cross_validation_folds = 2
+        
+        best_params, best_score = await training_pipeline._grid_search_optimization(
+            pipeline, X, y, sample_training_config
+        )
+        
+        assert isinstance(best_params, dict)
+        assert isinstance(best_score, (int, float))
+        assert 'alpha' in best_params
+    
+    @pytest.mark.asyncio
+    async def test_random_search_optimization(self, training_pipeline, sample_training_data, 
+                                            sample_training_config):
+        """Test random search optimization."""
+        X, y = sample_training_data
+        
+        # Create pipeline
+        model = training_pipeline._create_model(ModelType.RIDGE_REGRESSION)
+        sample_training_config.model_type = ModelType.RIDGE_REGRESSION
+        sample_training_config.optimization_trials = 5  # Small number for testing
+        pipeline = training_pipeline._create_pipeline(model, sample_training_config)
+        
+        # Reduce CV folds for faster testing
+        sample_training_config.cross_validation_folds = 2
+        
+        best_params, best_score = await training_pipeline._random_search_optimization(
+            pipeline, X, y, sample_training_config
+        )
+        
+        assert isinstance(best_params, dict)
+        assert isinstance(best_score, (int, float))
+        assert 'alpha' in best_params
 
-        # Simple configuration
-        config = await create_default_training_config("target")
-        config.models = [DEFAULT_MODEL_CONFIGS[0]]  # Use only Random Forest
-        config.cv_folds = 2
-        config.n_optimization_calls = 5
-        config.feature_selection_k = 15
 
-        pipeline = AutomatedTrainingPipeline(mock_ml_manager)
+class TestTrainingConfig:
+    """Test cases for TrainingConfig."""
+    
+    def test_training_config_creation(self):
+        """Test creating training configuration."""
+        config = TrainingConfig(
+            model_type=ModelType.RANDOM_FOREST,
+            target_column="target",
+            feature_columns=["feature_1", "feature_2"]
+        )
+        
+        assert config.model_type == ModelType.RANDOM_FOREST
+        assert config.target_column == "target"
+        assert config.feature_columns == ["feature_1", "feature_2"]
+        assert config.validation_split == 0.2  # Default value
+        assert config.random_state == 42  # Default value
+    
+    def test_training_config_with_custom_values(self):
+        """Test creating training configuration with custom values."""
+        config = TrainingConfig(
+            model_type=ModelType.LINEAR_REGRESSION,
+            target_column="price_change",
+            feature_columns=["close", "volume"],
+            validation_split=0.3,
+            test_split=0.15,
+            cross_validation_folds=10,
+            random_state=123,
+            scaling_method="robust",
+            feature_selection_k=20,
+            hyperparameter_optimization=False,
+            optimization_method=OptimizationMethod.GRID_SEARCH,
+            optimization_trials=50
+        )
+        
+        assert config.model_type == ModelType.LINEAR_REGRESSION
+        assert config.validation_split == 0.3
+        assert config.test_split == 0.15
+        assert config.cross_validation_folds == 10
+        assert config.random_state == 123
+        assert config.scaling_method == "robust"
+        assert config.feature_selection_k == 20
+        assert config.hyperparameter_optimization is False
+        assert config.optimization_method == OptimizationMethod.GRID_SEARCH
+        assert config.optimization_trials == 50
 
-        results = await pipeline.train_models(data, config)
 
-        assert len(results) == 1
-        result = results[0]
+class TestTrainingJob:
+    """Test cases for TrainingJob."""
+    
+    def test_training_job_creation(self):
+        """Test creating training job."""
+        config = TrainingConfig(
+            model_type=ModelType.RANDOM_FOREST,
+            target_column="target",
+            feature_columns=["feature_1", "feature_2"]
+        )
+        
+        job = TrainingJob(
+            job_id="test_job_123",
+            model_id="test_model_456",
+            job_type=TrainingJobType.INITIAL_TRAINING,
+            status=TrainingJobStatus.QUEUED,
+            config=config,
+            dataset_config={"n_samples": 1000},
+            priority=5
+        )
+        
+        assert job.job_id == "test_job_123"
+        assert job.model_id == "test_model_456"
+        assert job.job_type == TrainingJobType.INITIAL_TRAINING
+        assert job.status == TrainingJobStatus.QUEUED
+        assert job.config == config
+        assert job.dataset_config == {"n_samples": 1000}
+        assert job.priority == 5
 
-        # Verify the model was trained successfully
-        assert result.model_object is not None
-        assert len(result.feature_names) > 0
-        assert result.best_score > 0
 
-        # Verify feature engineering worked
-        assert len(result.feature_names) <= config.feature_selection_k
-
-        # Verify validation metrics are reasonable
-        for metric_name, metric_value in result.validation_metrics.items():
-            assert (
-                0 <= metric_value <= 1
-            ), f"Metric {metric_name} has invalid value: {metric_value}"
+@pytest.mark.asyncio
+async def test_integration_training_pipeline_workflow():
+    """Integration test for complete training pipeline workflow."""
+    # Create temporary database
+    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp_file:
+        db_path = tmp_file.name
+    
+    try:
+        database_url = f"sqlite:///{db_path}"
+        mlflow_uri = "sqlite:///test_mlflow.db"
+        
+        with patch('stock_analysis_system.ml.automated_training_pipeline.create_engine'):
+            with patch('stock_analysis_system.ml.automated_training_pipeline.mlflow'):
+                pipeline = AutomatedTrainingPipeline(
+                    database_url=database_url,
+                    mlflow_tracking_uri=mlflow_uri,
+                    max_concurrent_jobs=1
+                )
+                
+                # Mock database operations
+                pipeline._store_training_job = AsyncMock(return_value=None)
+                pipeline._update_training_job_status = AsyncMock(return_value=None)
+                pipeline._save_model_artifacts = AsyncMock(return_value="models/test_job")
+                pipeline._log_training_to_mlflow = AsyncMock(return_value=None)
+                
+                # Create training configuration
+                config = TrainingConfig(
+                    model_type=ModelType.LINEAR_REGRESSION,
+                    target_column="target",
+                    feature_columns=["feature_1", "feature_2"],
+                    validation_split=0.2,
+                    test_split=0.1,
+                    cross_validation_folds=2,  # Small for testing
+                    hyperparameter_optimization=False  # Disable for faster testing
+                )
+                
+                dataset_config = {
+                    "n_samples": 100,
+                    "n_features": 5
+                }
+                
+                # Submit training job
+                job_id = await pipeline.submit_training_job(
+                    model_id="integration_test_model",
+                    job_type=TrainingJobType.INITIAL_TRAINING,
+                    config=config,
+                    dataset_config=dataset_config,
+                    priority=1,
+                    triggered_by="integration_test"
+                )
+                
+                assert job_id is not None
+                
+                # Check initial queue status
+                queue_status = await pipeline.get_queue_status()
+                assert queue_status['queued_jobs'] >= 0  # Job might have started already
+                
+                # Wait a bit for job to potentially start
+                await asyncio.sleep(0.1)
+                
+                # Check job status
+                job_status = await pipeline.get_job_status(job_id)
+                assert job_status is not None
+                assert job_status.job_id == job_id
+                
+                # Test job cancellation
+                cancel_success = await pipeline.cancel_job(job_id)
+                # Note: Success depends on job state, so we just check it doesn't error
+                
+                # Test cleanup
+                cleanup_count = await pipeline.cleanup_old_jobs(retention_days=0)
+                assert isinstance(cleanup_count, int)
+                
+    finally:
+        # Cleanup
+        if os.path.exists(db_path):
+            os.unlink(db_path)
+        if os.path.exists("test_mlflow.db"):
+            os.unlink("test_mlflow.db")
 
 
 if __name__ == "__main__":

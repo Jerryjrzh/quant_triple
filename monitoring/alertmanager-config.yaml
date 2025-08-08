@@ -1,0 +1,197 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: stock-analysis
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'smtp.company.com:587'
+      smtp_from: 'alerts@company.com'
+      smtp_auth_username: 'alerts@company.com'
+      smtp_auth_password: 'password'
+      
+    # 路由配置
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'default-receiver'
+      routes:
+        # 关键告警立即通知
+        - match:
+            severity: critical
+          receiver: 'critical-alerts'
+          group_wait: 0s
+          repeat_interval: 5m
+          
+        # API相关告警
+        - match:
+            service: api
+          receiver: 'api-team'
+          
+        # 数据库告警
+        - match:
+            service: database
+          receiver: 'dba-team'
+          
+        # 系统告警
+        - match:
+            service: system
+          receiver: 'ops-team'
+          
+        # 业务告警
+        - match:
+            service: business
+          receiver: 'dev-team'
+
+    # 抑制规则
+    inhibit_rules:
+      # 如果整个服务down了，就不要发送其他相关告警
+      - source_match:
+          severity: 'critical'
+        target_match:
+          severity: 'warning'
+        equal: ['service']
+        
+      # 如果节点down了，就不要发送该节点上的其他告警
+      - source_match:
+          alertname: 'NodeDown'
+        target_match_re:
+          alertname: '.*'
+        equal: ['instance']
+
+    # 接收器配置
+    receivers:
+      - name: 'default-receiver'
+        email_configs:
+          - to: 'ops@company.com'
+            subject: '[ALERT] {{ .GroupLabels.alertname }}'
+            body: |
+              {{ range .Alerts }}
+              Alert: {{ .Annotations.summary }}
+              Description: {{ .Annotations.description }}
+              Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
+              {{ end }}
+
+      - name: 'critical-alerts'
+        email_configs:
+          - to: 'ops@company.com,dev@company.com,dba@company.com'
+            subject: '[CRITICAL] {{ .GroupLabels.alertname }}'
+            body: |
+              🚨 CRITICAL ALERT 🚨
+              
+              {{ range .Alerts }}
+              Alert: {{ .Annotations.summary }}
+              Description: {{ .Annotations.description }}
+              Severity: {{ .Labels.severity }}
+              Service: {{ .Labels.service }}
+              Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+              
+              Labels: {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}
+              {{ end }}
+              
+              Please take immediate action!
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+            channel: '#alerts-critical'
+            title: '🚨 Critical Alert: {{ .GroupLabels.alertname }}'
+            text: |
+              {{ range .Alerts }}
+              *Alert:* {{ .Annotations.summary }}
+              *Description:* {{ .Annotations.description }}
+              *Service:* {{ .Labels.service }}
+              *Severity:* {{ .Labels.severity }}
+              {{ end }}
+        webhook_configs:
+          - url: 'http://alertmanager-webhook:8080/webhook'
+            send_resolved: true
+
+      - name: 'api-team'
+        email_configs:
+          - to: 'api-team@company.com'
+            subject: '[API Alert] {{ .GroupLabels.alertname }}'
+            body: |
+              API服务告警通知
+              
+              {{ range .Alerts }}
+              告警: {{ .Annotations.summary }}
+              描述: {{ .Annotations.description }}
+              服务: {{ .Labels.service }}
+              严重程度: {{ .Labels.severity }}
+              时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+              {{ end }}
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+            channel: '#api-alerts'
+            title: 'API Alert: {{ .GroupLabels.alertname }}'
+
+      - name: 'dba-team'
+        email_configs:
+          - to: 'dba@company.com'
+            subject: '[Database Alert] {{ .GroupLabels.alertname }}'
+            body: |
+              数据库告警通知
+              
+              {{ range .Alerts }}
+              告警: {{ .Annotations.summary }}
+              描述: {{ .Annotations.description }}
+              数据库: {{ .Labels.instance }}
+              严重程度: {{ .Labels.severity }}
+              时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+              {{ end }}
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+            channel: '#database-alerts'
+            title: 'Database Alert: {{ .GroupLabels.alertname }}'
+
+      - name: 'ops-team'
+        email_configs:
+          - to: 'ops@company.com'
+            subject: '[System Alert] {{ .GroupLabels.alertname }}'
+            body: |
+              系统告警通知
+              
+              {{ range .Alerts }}
+              告警: {{ .Annotations.summary }}
+              描述: {{ .Annotations.description }}
+              节点: {{ .Labels.instance }}
+              严重程度: {{ .Labels.severity }}
+              时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+              {{ end }}
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+            channel: '#system-alerts'
+            title: 'System Alert: {{ .GroupLabels.alertname }}'
+
+      - name: 'dev-team'
+        email_configs:
+          - to: 'dev@company.com'
+            subject: '[Business Alert] {{ .GroupLabels.alertname }}'
+            body: |
+              业务告警通知
+              
+              {{ range .Alerts }}
+              告警: {{ .Annotations.summary }}
+              描述: {{ .Annotations.description }}
+              服务: {{ .Labels.service }}
+              严重程度: {{ .Labels.severity }}
+              时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+              {{ end }}
+        slack_configs:
+          - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+            channel: '#business-alerts'
+            title: 'Business Alert: {{ .GroupLabels.alertname }}'
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-secrets
+  namespace: stock-analysis
+type: Opaque
+stringData:
+  smtp_password: "your_smtp_password"
+  slack_webhook_url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+  webhook_url: "http://alertmanager-webhook:8080/webhook"

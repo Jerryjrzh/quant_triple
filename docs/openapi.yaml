@@ -1,0 +1,1321 @@
+openapi: 3.0.3
+info:
+  title: 爬虫接口集成系统 API
+  description: |
+    爬虫接口集成系统提供统一的股票市场数据获取接口，支持多数据源自动切换、
+    实时数据推送、系统监控等功能。
+    
+    ## 主要特性
+    - 多数据源集成 (Tushare, AKShare, Wind等)
+    - 自动故障转移和降级
+    - 实时数据推送 (WebSocket)
+    - 智能缓存机制
+    - 全面的系统监控
+    
+    ## 认证方式
+    使用Bearer Token进行认证，在请求头中添加：
+    ```
+    Authorization: Bearer <your_token>
+    ```
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@stockanalysis.com
+    url: https://docs.stockanalysis.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: 开发环境
+  - url: https://api.stockanalysis.com/v1
+    description: 生产环境
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - 认证
+      summary: 用户登录
+      description: 使用用户名和密码获取访问令牌
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: 用户名
+                  example: "admin"
+                password:
+                  type: string
+                  format: password
+                  description: 密码
+                  example: "password123"
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: 访问令牌
+                  token_type:
+                    type: string
+                    example: "bearer"
+                  expires_in:
+                    type: integer
+                    description: 令牌过期时间（秒）
+                    example: 3600
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /data/request:
+    post:
+      tags:
+        - 数据获取
+      summary: 统一数据请求
+      description: 通用的数据请求接口，支持多种数据类型和数据源
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataRequest'
+      responses:
+        '200':
+          description: 数据获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /data/realtime/{symbol}:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取实时行情
+      description: 获取指定股票的实时行情数据
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: 股票代码
+          schema:
+            type: string
+            example: "000001.SZ"
+        - name: fields
+          in: query
+          description: 返回字段列表，逗号分隔
+          schema:
+            type: string
+            example: "price,change,volume"
+        - name: source
+          in: query
+          description: 指定数据源
+          schema:
+            type: string
+            enum: [tushare, akshare, wind]
+      responses:
+        '200':
+          description: 实时数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/RealtimeData'
+                  source:
+                    type: string
+                    example: "tushare"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /data/history/{symbol}:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取历史行情
+      description: 获取指定股票的历史行情数据
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: 股票代码
+          schema:
+            type: string
+            example: "000001.SZ"
+        - name: start_date
+          in: query
+          description: 开始日期
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: end_date
+          in: query
+          description: 结束日期
+          schema:
+            type: string
+            format: date
+            example: "2024-12-31"
+        - name: frequency
+          in: query
+          description: 数据频率
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+            default: daily
+        - name: adjust
+          in: query
+          description: 复权类型
+          schema:
+            type: string
+            enum: [none, qfq, hfq]
+            default: none
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+      responses:
+        '200':
+          description: 历史数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HistoryData'
+                  total:
+                    type: integer
+                    description: 总记录数
+                  page:
+                    type: integer
+                    description: 当前页码
+                  page_size:
+                    type: integer
+                    description: 每页数量
+
+  /data/dragon-tiger:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取龙虎榜数据
+      description: 获取龙虎榜交易数据
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: 查询日期
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: symbol
+          in: query
+          description: 股票代码过滤
+          schema:
+            type: string
+            example: "000001.SZ"
+        - name: reason
+          in: query
+          description: 上榜原因过滤
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 龙虎榜数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DragonTigerData'
+
+  /data/fund-flow/{symbol}:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取资金流向
+      description: 获取指定股票的资金流向数据
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: 股票代码
+          schema:
+            type: string
+            example: "000001.SZ"
+        - name: period
+          in: query
+          description: 时间周期
+          schema:
+            type: string
+            enum: [1d, 3d, 5d, 10d, 20d]
+            default: "1d"
+        - name: date
+          in: query
+          description: 查询日期
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+      responses:
+        '200':
+          description: 资金流向数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/FundFlowData'
+
+  /data/limitup-reason:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取涨停原因
+      description: 获取涨停股票的原因分析
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: 查询日期
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: symbol
+          in: query
+          description: 股票代码过滤
+          schema:
+            type: string
+            example: "000001.SZ"
+      responses:
+        '200':
+          description: 涨停原因数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LimitUpReasonData'
+
+  /data/etf/{symbol}:
+    get:
+      tags:
+        - 数据获取
+      summary: 获取ETF数据
+      description: 获取ETF基金的相关数据
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: ETF代码
+          schema:
+            type: string
+            example: "510050.SH"
+        - name: data_type
+          in: query
+          description: 数据类型
+          schema:
+            type: string
+            enum: [realtime, history, holdings]
+            default: realtime
+        - name: start_date
+          in: query
+          description: 开始日期（历史数据）
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: 结束日期（历史数据）
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: ETF数据获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ETFData'
+
+  /data/batch:
+    post:
+      tags:
+        - 数据获取
+      summary: 批量数据请求
+      description: 一次请求获取多个股票的数据
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - requests
+              properties:
+                requests:
+                  type: array
+                  maxItems: 100
+                  items:
+                    $ref: '#/components/schemas/DataRequest'
+                options:
+                  type: object
+                  properties:
+                    parallel:
+                      type: boolean
+                      description: 是否并行执行
+                      default: true
+                    timeout:
+                      type: integer
+                      description: 超时时间（秒）
+                      default: 30
+      responses:
+        '200':
+          description: 批量请求完成
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                        success:
+                          type: boolean
+                        data:
+                          type: object
+                        error:
+                          type: string
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      successful:
+                        type: integer
+                      failed:
+                        type: integer
+                      execution_time:
+                        type: number
+
+  /health:
+    get:
+      tags:
+        - 系统管理
+      summary: 健康检查
+      description: 检查系统各组件的健康状态
+      security: []
+      responses:
+        '200':
+          description: 系统健康状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
+  /system/status:
+    get:
+      tags:
+        - 系统管理
+      summary: 系统状态
+      description: 获取系统整体运行状态
+      responses:
+        '200':
+          description: 系统状态信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatus'
+
+  /system/data-sources:
+    get:
+      tags:
+        - 系统管理
+      summary: 数据源状态
+      description: 获取所有数据源的配置和状态
+      responses:
+        '200':
+          description: 数据源状态列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data_sources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DataSourceStatus'
+
+  /system/cache/stats:
+    get:
+      tags:
+        - 系统管理
+      summary: 缓存统计
+      description: 获取缓存使用统计信息
+      responses:
+        '200':
+          description: 缓存统计信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStats'
+
+  /system/cache:
+    delete:
+      tags:
+        - 系统管理
+      summary: 清除缓存
+      description: 清除指定类型或模式的缓存
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cache_type:
+                  type: string
+                  description: 缓存类型
+                  example: "realtime_data"
+                pattern:
+                  type: string
+                  description: 缓存键模式
+                  example: "stock:*"
+      responses:
+        '200':
+          description: 缓存清除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  cleared_keys:
+                    type: integer
+                    description: 清除的键数量
+
+  /system/errors:
+    get:
+      tags:
+        - 系统管理
+      summary: 错误统计
+      description: 获取系统错误统计信息
+      parameters:
+        - name: hours
+          in: query
+          description: 统计时间范围（小时）
+          schema:
+            type: integer
+            default: 24
+        - name: category
+          in: query
+          description: 错误类别过滤
+          schema:
+            type: string
+            enum: [network, database, data_format, external_api]
+      responses:
+        '200':
+          description: 错误统计信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorStatistics'
+
+  /system/degradation:
+    post:
+      tags:
+        - 系统管理
+      summary: 手动降级
+      description: 手动触发系统降级
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - level
+                - services
+                - reason
+              properties:
+                level:
+                  type: string
+                  enum: [light, moderate, severe, critical]
+                  description: 降级级别
+                services:
+                  type: array
+                  items:
+                    type: string
+                  description: 受影响的服务
+                reason:
+                  type: string
+                  description: 降级原因
+      responses:
+        '200':
+          description: 降级触发成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  event_id:
+                    type: string
+                    description: 降级事件ID
+
+  /system/failover:
+    get:
+      tags:
+        - 系统管理
+      summary: 故障转移状态
+      description: 获取故障转移系统状态
+      responses:
+        '200':
+          description: 故障转移状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailoverStatus'
+    
+    post:
+      tags:
+        - 系统管理
+      summary: 手动故障转移
+      description: 手动触发资源故障转移
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resource_type
+                - failed_resource
+                - reason
+              properties:
+                resource_type:
+                  type: string
+                  enum: [database, data_source, cache, api_endpoint]
+                  description: 资源类型
+                failed_resource:
+                  type: string
+                  description: 失败的资源ID
+                reason:
+                  type: string
+                  description: 故障转移原因
+      responses:
+        '200':
+          description: 故障转移触发成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  from_resource:
+                    type: string
+                  to_resource:
+                    type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    DataRequest:
+      type: object
+      required:
+        - data_type
+        - symbol
+      properties:
+        data_type:
+          type: string
+          enum: [stock_realtime, stock_history, fund_flow, dragon_tiger, limitup_reason, etf_data]
+          description: 数据类型
+        symbol:
+          type: string
+          description: 股票代码或ETF代码
+          example: "000001.SZ"
+        start_date:
+          type: string
+          format: date
+          description: 开始日期
+        end_date:
+          type: string
+          format: date
+          description: 结束日期
+        source:
+          type: string
+          enum: [tushare, akshare, wind]
+          description: 指定数据源
+        parameters:
+          type: object
+          description: 额外参数
+          additionalProperties: true
+
+    DataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+        metadata:
+          type: object
+          properties:
+            source:
+              type: string
+              description: 数据源
+            total_records:
+              type: integer
+              description: 总记录数
+            query_time:
+              type: string
+              format: date-time
+              description: 查询时间
+            cache_hit:
+              type: boolean
+              description: 是否命中缓存
+
+    RealtimeData:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: "000001.SZ"
+        name:
+          type: string
+          example: "平安银行"
+        price:
+          type: number
+          format: float
+          example: 10.65
+        change:
+          type: number
+          format: float
+          example: 0.15
+        change_pct:
+          type: number
+          format: float
+          example: 1.43
+        volume:
+          type: integer
+          example: 1000000
+        amount:
+          type: number
+          format: float
+          example: 10650000
+        timestamp:
+          type: string
+          format: date-time
+
+    HistoryData:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        open:
+          type: number
+          format: float
+        high:
+          type: number
+          format: float
+        low:
+          type: number
+          format: float
+        close:
+          type: number
+          format: float
+        volume:
+          type: integer
+        amount:
+          type: number
+          format: float
+
+    DragonTigerData:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        symbol:
+          type: string
+        name:
+          type: string
+        close_price:
+          type: number
+          format: float
+        change_pct:
+          type: number
+          format: float
+        reason:
+          type: string
+        buy_amount:
+          type: number
+          format: float
+        sell_amount:
+          type: number
+          format: float
+        net_amount:
+          type: number
+          format: float
+        institutions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              buy_amount:
+                type: number
+                format: float
+              sell_amount:
+                type: number
+                format: float
+
+    FundFlowData:
+      type: object
+      properties:
+        symbol:
+          type: string
+        date:
+          type: string
+          format: date
+        period:
+          type: string
+        main_net_inflow:
+          type: number
+          format: float
+        main_net_inflow_pct:
+          type: number
+          format: float
+        super_large_net_inflow:
+          type: number
+          format: float
+        super_large_net_inflow_pct:
+          type: number
+          format: float
+        large_net_inflow:
+          type: number
+          format: float
+        large_net_inflow_pct:
+          type: number
+          format: float
+        medium_net_inflow:
+          type: number
+          format: float
+        medium_net_inflow_pct:
+          type: number
+          format: float
+        small_net_inflow:
+          type: number
+          format: float
+        small_net_inflow_pct:
+          type: number
+          format: float
+
+    LimitUpReasonData:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        symbol:
+          type: string
+        name:
+          type: string
+        reason:
+          type: string
+        detail_reason:
+          type: string
+        latest_price:
+          type: number
+          format: float
+        change_pct:
+          type: number
+          format: float
+        turnover_rate:
+          type: number
+          format: float
+        volume:
+          type: integer
+        amount:
+          type: number
+          format: float
+
+    ETFData:
+      type: object
+      properties:
+        symbol:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+          format: float
+        change:
+          type: number
+          format: float
+        change_pct:
+          type: number
+          format: float
+        volume:
+          type: integer
+        amount:
+          type: number
+          format: float
+        nav:
+          type: number
+          format: float
+        premium_rate:
+          type: number
+          format: float
+        timestamp:
+          type: string
+          format: date-time
+
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        components:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [healthy, degraded, failed]
+              response_time:
+                type: number
+                format: float
+              details:
+                type: object
+                additionalProperties: true
+
+    SystemStatus:
+      type: object
+      properties:
+        system_status:
+          type: string
+          enum: [normal, degraded, critical]
+        degradation_level:
+          type: string
+          enum: [normal, light, moderate, severe, critical]
+        active_degradations:
+          type: array
+          items:
+            type: string
+        failover_status:
+          type: object
+          properties:
+            active_resources:
+              type: object
+              additionalProperties:
+                type: string
+            total_failovers:
+              type: integer
+            success_rate:
+              type: number
+              format: float
+        performance_metrics:
+          type: object
+          properties:
+            requests_per_second:
+              type: number
+              format: float
+            average_response_time:
+              type: number
+              format: float
+            error_rate:
+              type: number
+              format: float
+            cache_hit_rate:
+              type: number
+              format: float
+
+    DataSourceStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, failed]
+        priority:
+          type: integer
+        quota:
+          type: object
+          properties:
+            total:
+              type: integer
+            used:
+              type: integer
+            remaining:
+              type: integer
+            reset_time:
+              type: string
+              format: date-time
+        health:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [healthy, degraded, failed]
+            last_check:
+              type: string
+              format: date-time
+            response_time:
+              type: number
+              format: float
+
+    CacheStats:
+      type: object
+      properties:
+        cache_stats:
+          type: object
+          properties:
+            total_keys:
+              type: integer
+            memory_usage:
+              type: string
+            memory_usage_pct:
+              type: number
+              format: float
+            hit_rate:
+              type: number
+              format: float
+            miss_rate:
+              type: number
+              format: float
+            evictions:
+              type: integer
+            connections:
+              type: integer
+        cache_types:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              keys:
+                type: integer
+              ttl:
+                type: integer
+              hit_rate:
+                type: number
+                format: float
+
+    ErrorStatistics:
+      type: object
+      properties:
+        error_statistics:
+          type: object
+          properties:
+            total_errors:
+              type: integer
+            error_rate:
+              type: number
+              format: float
+            categories:
+              type: object
+              additionalProperties:
+                type: integer
+            recent_errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  category:
+                    type: string
+                  message:
+                    type: string
+                  count:
+                    type: integer
+        degradation_status:
+          type: object
+          properties:
+            current_level:
+              type: string
+            active_degradations:
+              type: array
+              items:
+                type: string
+            degradation_history:
+              type: array
+              items:
+                type: object
+
+    FailoverStatus:
+      type: object
+      properties:
+        failover_status:
+          type: object
+          properties:
+            total_resources:
+              type: integer
+            healthy_resources:
+              type: integer
+            failed_resources:
+              type: integer
+            active_resources:
+              type: object
+              additionalProperties:
+                type: string
+            recent_failovers:
+              type: array
+              items:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  resource_type:
+                    type: string
+                  from:
+                    type: string
+                  to:
+                    type: string
+                  reason:
+                    type: string
+                  success:
+                    type: boolean
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: 错误代码
+            message:
+              type: string
+              description: 错误消息
+            details:
+              type: object
+              description: 错误详情
+              additionalProperties: true
+            timestamp:
+              type: string
+              format: date-time
+              description: 错误时间
+            request_id:
+              type: string
+              description: 请求ID
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "INVALID_PARAMETERS"
+              message: "请求参数无效"
+              details:
+                field: "symbol"
+                value: "invalid_symbol"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+    Unauthorized:
+      description: 认证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "INVALID_TOKEN"
+              message: "认证令牌无效或过期"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+    Forbidden:
+      description: 权限不足
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "INSUFFICIENT_PERMISSIONS"
+              message: "权限不足"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "DATA_NOT_FOUND"
+              message: "请求的数据不存在"
+              details:
+                symbol: "000001.SZ"
+                date: "2024-01-01"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+    TooManyRequests:
+      description: 请求频率超限
+      headers:
+        X-RateLimit-Limit:
+          description: 请求限制
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          description: 剩余请求数
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          description: 限制重置时间
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "RATE_LIMIT_EXCEEDED"
+              message: "请求频率超限"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+    ServiceUnavailable:
+      description: 服务不可用
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "DATA_SOURCE_UNAVAILABLE"
+              message: "数据源不可用"
+              timestamp: "2024-01-01T10:00:00Z"
+              request_id: "req_123456789"
+
+tags:
+  - name: 认证
+    description: 用户认证和授权
+  - name: 数据获取
+    description: 股票市场数据获取接口
+  - name: 系统管理
+    description: 系统监控和管理接口
