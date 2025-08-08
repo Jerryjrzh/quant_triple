@@ -30,6 +30,22 @@ seaborn==0.13.2
 mlflow==2.16.2
 networkx==3.3
 
+# Deep Learning (New)
+torch==2.1.0
+torchvision==0.16.0
+transformers==4.35.0
+
+# Technical Analysis (New)
+TA-Lib==0.4.28
+
+# Multi-Market Support (New)
+yfinance==0.2.28
+pytz==2023.3
+
+# Advanced Visualization (New)
+kaleido==0.2.1  # For static image export
+dash==2.14.1    # For interactive dashboards
+
 # Testing
 pytest==8.3.3
 pytest-asyncio==0.24.0
